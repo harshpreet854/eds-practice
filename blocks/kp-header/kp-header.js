@@ -44,37 +44,44 @@ export default async function decorate(block) {
       desktopLogo = getImage(cells[0]);
       mobileLogo = getImage(cells[1]);
 
-      // Extract link - try to find <a> tag first
-      const linkCell = cells[2];
-      if (linkCell) {
-        const linkEl = linkCell.querySelector('a');
+      // Extract link from third cell
+      if (cells[2]) {
+        // Try to find <a> tag first
+        let linkEl = cells[2].querySelector('a');
         if (linkEl) {
           logoLink = linkEl.getAttribute('href');
+          console.log('Found <a> tag:', logoLink);
         } else {
-          // If no <a> tag, use the text content
-          const linkText = getText(linkCell);
-          if (linkText) {
+          // If no <a> tag, check for text that looks like a URL
+          const linkText = getText(cells[2]);
+          if (linkText && (linkText.startsWith('http://') || linkText.startsWith('https://'))) {
             logoLink = linkText;
+            console.log('Found URL text:', logoLink);
+          } else {
+            // Check all child elements for links
+            const allLinks = cells[2].querySelectorAll('a');
+            if (allLinks.length > 0) {
+              logoLink = allLinks[0].getAttribute('href');
+              console.log('Found link in child elements:', logoLink);
+            }
           }
         }
       }
-      console.log('Logo link extracted:', logoLink);
+      console.log('Final logo link:', logoLink);
     } else {
       // Subsequent rows: languages
       const name = getText(cells[0]);
       const code = getText(cells[1]);
       const label = getText(cells[2]);
 
-      console.log(`Row ${index}: name="${name}", code="${code}", label="${label}"`);
-
       if (name && code) {
         languages.push({ name, code, label: label || 'Language' });
-        console.log(`Added language: ${name} (${code})`);
+        console.log(`Added language: ${name} (${code}) - Label: ${label}`);
       }
     }
   });
 
-  console.log('Final languages array:', languages);
+  console.log('Languages extracted:', languages);
 
   // Default if no languages
   if (!languages.length) {
