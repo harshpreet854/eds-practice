@@ -1,5 +1,6 @@
 export default async function decorate(block) {
-  const rows = Array.from(block.children);
+  // Query table rows directly from the table structure
+  const rows = Array.from(block.querySelectorAll('table tbody tr'));
 
   let desktopLogo = null;
   let mobileLogo = null;
@@ -11,7 +12,7 @@ export default async function decorate(block) {
   const fixImageUrls = (element) => {
     if (!element) return;
 
-    const img = element.querySelector('img');
+    const img = element.querySelector('img:not(.ProseMirror-separator)');
     if (img && img.getAttribute('src')?.startsWith('./')) {
       img.src = new URL(img.getAttribute('src'), window.location.href).href;
     }
@@ -25,7 +26,11 @@ export default async function decorate(block) {
   };
 
   const getImage = (cell) => {
-    const el = cell?.querySelector('picture, img');
+    if (!cell) return null;
+
+    // Look for picture or img (skip ProseMirror separators)
+    let el = cell.querySelector('picture');
+    if (!el) el = cell.querySelector('img:not(.ProseMirror-separator)');
     if (!el) return null;
 
     const clone = el.cloneNode(true);
@@ -34,38 +39,33 @@ export default async function decorate(block) {
   };
 
   rows.forEach((row, index) => {
-    const cells = row.querySelectorAll(':scope > div');
+    const cells = row.querySelectorAll('td');
 
-    // Skip header row (index 0)
-    if (index === 0) return;
-
-    // Extract logo and link from row 1
-    if (index === 1) {
+    // First row after header: logos and link
+    if (index === 0) {
       desktopLogo = getImage(cells[0]);
       mobileLogo = getImage(cells[1]);
 
-      // Extract link from third cell
       const linkEl = cells[2]?.querySelector('a');
       logoLink = linkEl ? linkEl.getAttribute('href') : getText(cells[2]);
     } else {
-      // Extract language data from rows 2+
+      // Subsequent rows: languages
       const name = getText(cells[0]);
       const code = getText(cells[1]);
       const label = getText(cells[2]);
 
-      // Only add if we have both name and code
       if (name && code) {
         languages.push({ name, code, label: label || 'Language' });
       }
     }
   });
 
-  // Default language if none found
+  // Default if no languages
   if (!languages.length) {
     languages.push({ name: 'English', code: 'en', label: 'Language' });
   }
 
-  // Clear block and build UI
+  // Clear and rebuild
   block.textContent = '';
   block.className = 'kp-header';
 
@@ -121,7 +121,7 @@ export default async function decorate(block) {
     });
   }
 
-  // Create all language options
+  // Create language options
   languages.forEach((lang) => {
     const opt = document.createElement('button');
     opt.className = 'kp-language-option';
@@ -142,14 +142,12 @@ export default async function decorate(block) {
     menu.appendChild(opt);
   });
 
-  // Toggle dropdown
   button.onclick = (e) => {
     e.stopPropagation();
     const isOpen = menu.classList.toggle('open');
     button.setAttribute('aria-expanded', isOpen);
   };
 
-  // Close on outside click
   document.addEventListener('click', () => {
     if (menu.classList.contains('open')) {
       menu.classList.remove('open');
@@ -157,7 +155,6 @@ export default async function decorate(block) {
     }
   });
 
-  // Keyboard support
   button.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
