@@ -9,30 +9,23 @@ export default async function decorate(block) {
     headerBlock.style.display = 'none';
   }
 
-  // Extract brand, logo and language options from authored content
+  // Extract logo and language options from authored content
   const rows = Array.from(block.children);
 
   let logoElement = null;
-  let brandText = 'KAISER PERMANENTE';
   const languages = [];
 
   rows.forEach((row, index) => {
     const cells = row.querySelectorAll(':scope > div');
 
     if (index === 0) {
-      // First row: logo and/or brand text
+      // First row: logo image
       const firstCell = cells[0];
 
       // Check if first cell contains an image
       const img = firstCell?.querySelector('img');
       if (img) {
         logoElement = img.cloneNode(true);
-      }
-
-      // Get text content (excluding image)
-      const textContent = firstCell?.textContent.trim() || 'KAISER PERMANENTE';
-      if (textContent) {
-        brandText = textContent;
       }
     } else {
       // Subsequent rows are language options
@@ -57,21 +50,16 @@ export default async function decorate(block) {
   const header = document.createElement('div');
   header.className = 'kp-header-container';
 
-  // Create brand section
+  // Create brand section with logo
   const brandSection = document.createElement('div');
   brandSection.className = 'kp-header-brand';
-
+  
   // Add logo if present
   if (logoElement) {
     logoElement.classList.add('kp-header-logo');
     brandSection.appendChild(logoElement);
   }
 
-  // Add brand text
-  const brandTextElement = document.createElement('span');
-  brandTextElement.className = 'kp-header-brand-text';
-  brandTextElement.textContent = brandText;
-  brandSection.appendChild(brandTextElement);
 
   // Create language dropdown section
   const langSection = document.createElement('div');
