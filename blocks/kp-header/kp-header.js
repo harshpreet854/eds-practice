@@ -9,32 +9,36 @@ export default async function decorate(block) {
   let logoLink = '#';
   const languages = [];
 
+  const getText = (el) => el?.textContent?.trim() || '';
+
   rows.forEach((row, index) => {
     const cells = row.querySelectorAll(':scope > div');
 
-    // Skip first row (block name)
-    if (index === 0) return;
+    if (index === 0) return; // skip block name row
 
     if (index === 1) {
-      // Row 1 → logos + link
       desktopLogo = cells[0];
       mobileLogo = cells[1];
 
       const linkEl = cells[2]?.querySelector('a');
       logoLink = linkEl
         ? linkEl.getAttribute('href')
-        : cells[2]?.textContent.trim();
+        : getText(cells[2]);
     } else {
-      // Language rows
-      const name = cells[0]?.textContent.trim();
-      const code = cells[1]?.textContent.trim();
-      const label = cells[2]?.textContent.trim();
+      const name = getText(cells[0]);
+      const code = getText(cells[1]);
+      const label = getText(cells[2]);
 
       if (name && code) {
         languages.push({ name, code, label });
       }
     }
   });
+
+  // ✅ fallback safety (prevents crash)
+  if (!languages.length) {
+    languages.push({ name: 'English', code: 'en', label: 'Language' });
+  }
 
   block.textContent = '';
 
@@ -51,14 +55,12 @@ export default async function decorate(block) {
   const logoLinkEl = document.createElement('a');
   logoLinkEl.href = logoLink;
 
-  // Desktop logo
   if (desktopLogo) {
     const d = desktopLogo.cloneNode(true);
     d.classList.add('kp-logo-desktop');
     logoLinkEl.appendChild(d);
   }
 
-  // Mobile logo
   if (mobileLogo) {
     const m = mobileLogo.cloneNode(true);
     m.classList.add('kp-logo-mobile');
@@ -87,8 +89,10 @@ export default async function decorate(block) {
   let current = languages[0];
 
   function updateUI(lang) {
+    if (!lang) return; // ✅ extra safety
+
     button.textContent = lang.name;
-    label.textContent = lang.label;
+    label.textContent = lang.label || 'Language';
 
     menu.querySelectorAll('.kp-language-option').forEach((opt) => {
       opt.classList.remove('active');
@@ -135,7 +139,7 @@ export default async function decorate(block) {
   langDesktop.appendChild(langWrapper);
 
   /* ========================= */
-  /* ASSEMBLE */
+  /* FINAL */
   /* ========================= */
 
   header.append(brand, langDesktop);
