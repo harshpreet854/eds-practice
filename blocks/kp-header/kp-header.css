@@ -36,24 +36,23 @@
     width: auto;
 }
 
-/* Hide desktop logo on mobile */
+/* MOBILE VIEW (default) */
 .kp-logo-desktop {
-    display: none;
+    display: none !important;  /* Hide desktop logo on mobile */
 }
 
-/* Show mobile logo on mobile */
 .kp-logo-mobile {
-    display: block;
+    display: block !important;  /* Show mobile logo on mobile */
 }
 
-/* On desktop: show desktop, hide mobile */
+/* DESKTOP VIEW */
 @media (min-width: 600px) {
     .kp-logo-desktop {
-        display: block;
+        display: block !important;  /* Show desktop logo on desktop */
     }
 
     .kp-logo-mobile {
-        display: none;
+        display: none !important;   /* Hide mobile logo on desktop */
     }
 }
 
@@ -167,7 +166,7 @@
 }
 
 /* Mobile optimizations */
-@media (max-width: 480px) {
+@media (max-width: 599px) {
     .kp-header-container {
         padding: 12px 16px;
         gap: 12px;
