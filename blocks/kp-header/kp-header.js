@@ -43,9 +43,7 @@ export default async function decorate(block) {
       mobileLogo = getImage(cells[1]);
 
       const linkEl = cells[2]?.querySelector('a');
-      logoLink = linkEl
-        ? linkEl.getAttribute('href')
-        : getText(cells[2]);
+      logoLink = linkEl?.getAttribute('href') || getText(cells[2]);
     } else {
       const name = getText(cells[0]);
       const code = getText(cells[1]);
@@ -62,12 +60,11 @@ export default async function decorate(block) {
   }
 
   block.textContent = '';
-  block.className = 'kp-header';
 
   const header = document.createElement('div');
   header.className = 'kp-header-container';
 
-  /* LOGO */
+  // LOGO
   const brand = document.createElement('div');
   brand.className = 'kp-header-brand';
 
@@ -86,7 +83,7 @@ export default async function decorate(block) {
 
   brand.appendChild(logoLinkEl);
 
-  /* LANGUAGE */
+  // LANGUAGE
   const langWrapper = document.createElement('div');
   langWrapper.className = 'kp-language-wrapper';
 
@@ -95,8 +92,9 @@ export default async function decorate(block) {
 
   const button = document.createElement('button');
   button.className = 'kp-language-button';
-  button.setAttribute('aria-haspopup', 'true');
+  button.setAttribute('aria-haspopup', 'listbox');
   button.setAttribute('aria-expanded', 'false');
+  button.setAttribute('aria-label', 'Language selection');
 
   const menu = document.createElement('div');
   menu.className = 'kp-language-menu';
@@ -106,7 +104,6 @@ export default async function decorate(block) {
 
   function updateUI(lang) {
     button.textContent = lang.name;
-    button.setAttribute('aria-expanded', 'false');
     label.textContent = lang.label || 'Language';
 
     menu.querySelectorAll('.kp-language-option').forEach((opt) => {
@@ -119,19 +116,21 @@ export default async function decorate(block) {
     });
   }
 
-  languages.forEach((lang, index) => {
+  languages.forEach((lang) => {
     const opt = document.createElement('button');
     opt.className = 'kp-language-option';
     opt.textContent = lang.name;
     opt.dataset.code = lang.code;
     opt.setAttribute('role', 'option');
-    opt.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+    opt.setAttribute('aria-selected', lang.code === current.code);
 
     opt.onclick = (e) => {
       e.stopPropagation();
       current = lang;
       updateUI(lang);
       menu.classList.remove('open');
+      button.setAttribute('aria-expanded', 'false');
+      button.focus();
     };
 
     menu.appendChild(opt);
@@ -140,7 +139,7 @@ export default async function decorate(block) {
   button.onclick = (e) => {
     e.stopPropagation();
     const isOpen = menu.classList.toggle('open');
-    button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    button.setAttribute('aria-expanded', isOpen.toString());
   };
 
   // Close menu on outside click
@@ -153,9 +152,13 @@ export default async function decorate(block) {
 
   // Keyboard support
   button.addEventListener('keydown', (e) => {
-    if (e.code === 'Escape') {
+    if (e.key === 'Escape') {
       menu.classList.remove('open');
       button.setAttribute('aria-expanded', 'false');
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const isOpen = menu.classList.toggle('open');
+      button.setAttribute('aria-expanded', isOpen.toString());
     }
   });
 
