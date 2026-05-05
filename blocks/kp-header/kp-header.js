@@ -4,8 +4,7 @@ export default async function decorate(block) {
 
   const rows = Array.from(block.children);
 
-  let desktopLogoContent = null;
-  let mobileLogoContent = null;
+  let logoContent = null;
   let logoLink = '#';
   const languages = [];
 
@@ -13,15 +12,15 @@ export default async function decorate(block) {
     const cells = row.querySelectorAll(':scope > div');
 
     if (index === 0) {
-      desktopLogoContent = cells[0]?.innerHTML;
-    } else if (index === 1) {
-      mobileLogoContent = cells[0]?.innerHTML;
-    } else if (index === 2) {
-      const linkEl = cells[0]?.querySelector('a');
+      // Logo + link in SAME row
+      logoContent = cells[0]?.innerHTML;
+
+      const linkEl = cells[1]?.querySelector('a');
       logoLink = linkEl
         ? linkEl.getAttribute('href')
-        : cells[0]?.textContent.trim();
+        : cells[1]?.textContent.trim();
     } else {
+      // Language rows
       const name = cells[0]?.textContent.trim();
       const code = cells[1]?.textContent.trim();
       const label = cells[2]?.textContent.trim();
@@ -48,20 +47,10 @@ export default async function decorate(block) {
   const logoLinkEl = document.createElement('a');
   logoLinkEl.href = logoLink;
 
-  if (desktopLogoContent) {
-    const d = document.createElement('div');
-    d.className = 'kp-logo-desktop';
-    d.innerHTML = desktopLogoContent;
-    logoLinkEl.appendChild(d);
-  }
+  const logo = document.createElement('div');
+  logo.innerHTML = logoContent;
 
-  if (mobileLogoContent) {
-    const m = document.createElement('div');
-    m.className = 'kp-logo-mobile';
-    m.innerHTML = mobileLogoContent;
-    logoLinkEl.appendChild(m);
-  }
-
+  logoLinkEl.appendChild(logo);
   brand.appendChild(logoLinkEl);
 
   /* LANGUAGE */
@@ -79,7 +68,6 @@ export default async function decorate(block) {
   menu.className = 'kp-language-menu';
 
   let current = languages[0];
-  let mobileHeaderLabel = null;
 
   function updateUI(lang) {
     button.textContent = lang.name;
@@ -91,10 +79,6 @@ export default async function decorate(block) {
         opt.classList.add('active');
       }
     });
-
-    if (mobileHeaderLabel) {
-      mobileHeaderLabel.textContent = lang.label;
-    }
   }
 
   languages.forEach((lang) => {
@@ -133,43 +117,7 @@ export default async function decorate(block) {
   langDesktop.className = 'kp-header-language';
   langDesktop.appendChild(langWrapper);
 
-  /* MOBILE MENU */
-  const menuBtn = document.createElement('button');
-  menuBtn.className = 'kp-menu-button';
-  menuBtn.innerHTML = `
-    <span class="kp-menu-icon"></span>
-    <span class="kp-menu-text">Menu</span>
-  `;
-
-  const mobileMenu = document.createElement('div');
-  mobileMenu.className = 'kp-mobile-menu';
-
-  const mobileHeader = document.createElement('div');
-  mobileHeader.className = 'kp-mobile-header';
-
-  mobileHeaderLabel = document.createElement('span');
-  mobileHeaderLabel.textContent = current.label;
-
-  const closeBtn = document.createElement('button');
-  closeBtn.className = 'kp-close-button';
-  closeBtn.innerHTML = '✕ Close';
-
-  mobileHeader.append(mobileHeaderLabel, closeBtn);
-  mobileMenu.appendChild(mobileHeader);
-
-  menuBtn.onclick = () => {
-    mobileMenu.appendChild(langWrapper);
-    mobileMenu.classList.add('open');
-  };
-
-  closeBtn.onclick = () => {
-    langDesktop.appendChild(langWrapper);
-    mobileMenu.classList.remove('open');
-  };
-
-  document.body.appendChild(mobileMenu);
-
   /* ASSEMBLE */
-  header.append(brand, menuBtn, langDesktop);
+  header.append(brand, langDesktop);
   block.appendChild(header);
 }
