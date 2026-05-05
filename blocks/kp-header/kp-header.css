@@ -216,3 +216,10 @@
         display: block;
     }
 }
+
+.kp-logo-desktop img,
+.kp-logo-mobile img,
+.kp-logo-desktop picture,
+.kp-logo-mobile picture {
+    display: block;
+}

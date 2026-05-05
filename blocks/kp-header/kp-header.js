@@ -4,8 +4,8 @@ export default async function decorate(block) {
 
   const rows = Array.from(block.children);
 
-  let desktopLogo = null;
-  let mobileLogo = null;
+  let desktopLogoContent = null;
+  let mobileLogoContent = null;
   let logoLink = '#';
   const languages = [];
 
@@ -13,9 +13,10 @@ export default async function decorate(block) {
     const cells = row.querySelectorAll(':scope > div');
 
     if (index === 0) {
-      desktopLogo = cells[0]?.querySelector('picture, img, svg');
+      // FULL content (not just img)
+      desktopLogoContent = cells[0]?.innerHTML;
     } else if (index === 1) {
-      mobileLogo = cells[0]?.querySelector('picture, img, svg');
+      mobileLogoContent = cells[0]?.innerHTML;
     } else if (index === 2) {
       const linkEl = cells[0]?.querySelector('a');
       logoLink = linkEl
@@ -42,7 +43,7 @@ export default async function decorate(block) {
   header.className = 'kp-header-container';
 
   /* ========================= */
-  /* LOGO (Desktop + Mobile) */
+  /* LOGO */
   /* ========================= */
 
   const brand = document.createElement('div');
@@ -52,16 +53,18 @@ export default async function decorate(block) {
   logoLinkEl.href = logoLink;
   logoLinkEl.className = 'kp-header-logo-link';
 
-  if (desktopLogo) {
-    const dLogo = desktopLogo.cloneNode(true);
-    dLogo.classList.add('kp-logo-desktop');
-    logoLinkEl.appendChild(dLogo);
+  if (desktopLogoContent) {
+    const d = document.createElement('div');
+    d.className = 'kp-logo-desktop';
+    d.innerHTML = desktopLogoContent;
+    logoLinkEl.appendChild(d);
   }
 
-  if (mobileLogo) {
-    const mLogo = mobileLogo.cloneNode(true);
-    mLogo.classList.add('kp-logo-mobile');
-    logoLinkEl.appendChild(mLogo);
+  if (mobileLogoContent) {
+    const m = document.createElement('div');
+    m.className = 'kp-logo-mobile';
+    m.innerHTML = mobileLogoContent;
+    logoLinkEl.appendChild(m);
   }
 
   brand.appendChild(logoLinkEl);
@@ -83,40 +86,55 @@ export default async function decorate(block) {
   menu.className = 'kp-language-menu';
 
   let current = languages[0];
-  label.textContent = current.label || 'Language';
-  button.textContent = current.name;
+
+  function updateLanguageUI(lang) {
+    button.textContent = lang.name;
+    label.textContent = lang.label || 'Language';
+
+    // update active state
+    menu.querySelectorAll('.kp-language-option').forEach((opt) => {
+      opt.classList.remove('active');
+      if (opt.dataset.code === lang.code) {
+        opt.classList.add('active');
+      }
+    });
+
+    // update mobile header label if exists
+    if (mobileHeaderLabel) {
+      mobileHeaderLabel.textContent = lang.label || 'Language';
+    }
+  }
 
   languages.forEach((lang) => {
     const opt = document.createElement('button');
     opt.className = 'kp-language-option';
     opt.textContent = lang.name;
+    opt.dataset.code = lang.code;
 
     if (lang.code === current.code) {
       opt.classList.add('active');
     }
 
-    opt.onclick = () => {
+    opt.addEventListener('click', (e) => {
+      e.stopPropagation();
       current = lang;
-      button.textContent = lang.name;
-      label.textContent = lang.label || 'Language';
-
-      menu.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-      opt.classList.add('active');
-
+      updateLanguageUI(lang);
       menu.classList.remove('open');
-    };
+    });
 
     menu.appendChild(opt);
   });
 
-  button.onclick = (e) => {
+  button.addEventListener('click', (e) => {
     e.stopPropagation();
     menu.classList.toggle('open');
-  };
+  });
 
   document.addEventListener('click', () => {
     menu.classList.remove('open');
   });
+
+  updateLanguageUI(current);
 
   langWrapper.append(label, button, menu);
 
@@ -141,11 +159,14 @@ export default async function decorate(block) {
   const mobileHeader = document.createElement('div');
   mobileHeader.className = 'kp-mobile-header';
 
+  const mobileHeaderLabel = document.createElement('span');
+  mobileHeaderLabel.textContent = current.label;
+
   const closeBtn = document.createElement('button');
   closeBtn.className = 'kp-close-button';
   closeBtn.innerHTML = '✕<br/>Close';
 
-  mobileHeader.innerHTML = `<span>${current.label}</span>`;
+  mobileHeader.appendChild(mobileHeaderLabel);
   mobileHeader.appendChild(closeBtn);
 
   mobileMenu.appendChild(mobileHeader);
