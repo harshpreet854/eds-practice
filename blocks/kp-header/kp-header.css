@@ -202,6 +202,13 @@
     }
 }
 
+.kp-logo-desktop img,
+.kp-logo-mobile img,
+.kp-logo-desktop picture,
+.kp-logo-mobile picture {
+    display: block;
+}
+
 /* Desktop vs Mobile logo */
 .kp-logo-mobile {
     display: none;
@@ -215,11 +222,4 @@
     .kp-logo-mobile {
         display: block;
     }
-}
-
-.kp-logo-desktop img,
-.kp-logo-mobile img,
-.kp-logo-desktop picture,
-.kp-logo-mobile picture {
-    display: block;
 }
