@@ -37,18 +37,8 @@ export default async function decorate(block) {
     languages.push({ name: 'Español', code: 'es' });
   }
 
-  // Remove the logo node from its original parent if present
-  if (logoElement && logoElement.parentNode) {
-    logoElement.parentNode.removeChild(logoElement);
-  }
-
   // Clear the block
   block.textContent = '';
-
-  // Ensure kp-header block is full width
-  block.style.width = '100vw';
-  block.style.margin = '0';
-  block.style.padding = '0';
 
   // Create header structure
   const header = document.createElement('div');
@@ -57,10 +47,12 @@ export default async function decorate(block) {
   // Create brand section with logo
   const brandSection = document.createElement('div');
   brandSection.className = 'kp-header-brand';
+
   // Add logo if present
   if (logoElement) {
-    logoElement.classList.add('kp-header-logo');
-    brandSection.appendChild(logoElement);
+    const logoClone = logoElement.cloneNode(true);
+    logoClone.classList.add('kp-header-logo');
+    brandSection.appendChild(logoClone);
   }
 
 
