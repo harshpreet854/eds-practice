@@ -38,31 +38,54 @@ export default async function decorate(block) {
 
   rows.forEach((row, index) => {
     const cells = row.querySelectorAll(':scope > div');
+    console.log(`=== Row ${index} ===`);
+    console.log(`Cells count: ${cells.length}`);
 
     // First row: logos and link
     if (index === 0) {
       desktopLogo = getImage(cells[0]);
       mobileLogo = getImage(cells[1]);
 
-      // Extract link from third cell
+      // DEBUG: Log the third cell structure
       if (cells[2]) {
-        // Try to find <a> tag first
+        console.log('Cell 2 innerHTML:', cells[2].innerHTML);
+        console.log('Cell 2 textContent:', cells[2].textContent);
+
+        // Try all possible link extraction methods
+
+        // Method 1: Direct <a> tag
         let linkEl = cells[2].querySelector('a');
         if (linkEl) {
           logoLink = linkEl.getAttribute('href');
-          console.log('Found <a> tag:', logoLink);
-        } else {
-          // If no <a> tag, check for text that looks like a URL
+          console.log('✓ Method 1 - Found <a> tag:', logoLink);
+        }
+
+        // Method 2: Text content is URL
+        if (logoLink === '#') {
           const linkText = getText(cells[2]);
           if (linkText && (linkText.startsWith('http://') || linkText.startsWith('https://'))) {
             logoLink = linkText;
-            console.log('Found URL text:', logoLink);
-          } else {
-            // Check all child elements for links
-            const allLinks = cells[2].querySelectorAll('a');
-            if (allLinks.length > 0) {
-              logoLink = allLinks[0].getAttribute('href');
-              console.log('Found link in child elements:', logoLink);
+            console.log('✓ Method 2 - Found URL text:', logoLink);
+          }
+        }
+
+        // Method 3: All links in cell
+        if (logoLink === '#') {
+          const allLinks = cells[2].querySelectorAll('a');
+          if (allLinks.length > 0) {
+            logoLink = allLinks[0].getAttribute('href');
+            console.log('✓ Method 3 - Found link in children:', logoLink);
+          }
+        }
+
+        // Method 4: Check for <p> > <a>
+        if (logoLink === '#') {
+          const pTag = cells[2].querySelector('p');
+          if (pTag) {
+            const linkInP = pTag.querySelector('a');
+            if (linkInP) {
+              logoLink = linkInP.getAttribute('href');
+              console.log('✓ Method 4 - Found <a> in <p>:', logoLink);
             }
           }
         }
@@ -74,14 +97,15 @@ export default async function decorate(block) {
       const code = getText(cells[1]);
       const label = getText(cells[2]);
 
+      console.log(`Language row - name: "${name}", code: "${code}", label: "${label}"`);
+
       if (name && code) {
         languages.push({ name, code, label: label || 'Language' });
-        console.log(`Added language: ${name} (${code}) - Label: ${label}`);
       }
     }
   });
 
-  console.log('Languages extracted:', languages);
+  console.log('Final languages array:', languages);
 
   // Default if no languages
   if (!languages.length) {
