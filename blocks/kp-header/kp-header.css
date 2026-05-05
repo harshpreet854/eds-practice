@@ -11,12 +11,19 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 32px;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
 /* Logo */
+.kp-header-brand {
+    flex-shrink: 0;
+}
+
 .kp-header-brand a {
     display: flex;
     align-items: center;
+    text-decoration: none;
 }
 
 .kp-header picture,
@@ -32,36 +39,50 @@
 
 .kp-header-language {
     display: flex;
+    align-items: center;
 }
 
 .kp-language-wrapper {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .kp-language-label {
     font-size: 14px;
+    font-weight: 500;
+    color: white;
+    min-width: fit-content;
 }
 
 /* Button */
 .kp-language-button {
     background-color: transparent;
-    border: 1px solid rgba(255,255,255,0.6);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     color: white;
-    padding: 6px 14px;
+    padding: 8px 14px;
     border-radius: 6px;
     font-size: 14px;
     cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: border-color 0.2s ease;
+}
+
+.kp-language-button:hover {
+    border-color: rgba(255, 255, 255, 1);
 }
 
 /* Caret */
 .kp-language-button::after {
     content: '▾';
-    margin-left: 6px;
     font-size: 12px;
     transition: transform 0.2s ease;
+    display: inline-block;
 }
 
 .kp-language-button[aria-expanded="true"]::after {
@@ -71,15 +92,16 @@
 /* Dropdown */
 .kp-language-menu {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 8px);
     right: 0;
     background-color: #ffffff;
     border-radius: 6px;
     min-width: 180px;
     display: none;
-    z-index: 100;
+    z-index: 1000;
     overflow: hidden;
     border: 1px solid #0d5cab;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .kp-language-menu.open {
@@ -98,6 +120,8 @@
     cursor: pointer;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.15s ease;
 }
 
 .kp-language-option:hover {
@@ -112,6 +136,7 @@
 .kp-language-option.active::after {
     content: '✔';
     color: #0d5cab;
+    font-weight: bold;
 }
 
 .kp-language-option:not(:last-child) {
@@ -131,12 +156,63 @@
     display: none;
 }
 
-@media (width < 600px) {
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .kp-header-container {
+        padding: 12px 16px;
+    }
+
     .kp-logo-desktop {
         display: none;
     }
 
     .kp-logo-mobile {
         display: block;
+    }
+
+    .kp-header picture,
+    .kp-header img {
+        height: 32px;
+    }
+
+    .kp-language-wrapper {
+        gap: 8px;
+    }
+
+    .kp-language-label {
+        font-size: 13px;
+    }
+
+    .kp-language-button {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .kp-language-menu {
+        min-width: 160px;
+    }
+
+    .kp-language-option {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .kp-header-container {
+        padding: 10px 12px;
+    }
+
+    .kp-language-label {
+        display: none;
+    }
+
+    .kp-language-button {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .kp-language-button::after {
+        font-size: 10px;
     }
 }

@@ -31,7 +31,7 @@ export default async function decorate(block) {
     if (!el) return null;
 
     const clone = el.cloneNode(true);
-    fixImageUrls(clone); // ✅ important
+    fixImageUrls(clone);
     return clone;
   };
 
@@ -45,9 +45,7 @@ export default async function decorate(block) {
       mobileLogo = getImage(cells[1]);
 
       const linkEl = cells[2]?.querySelector('a');
-      logoLink = linkEl
-        ? linkEl.getAttribute('href')
-        : getText(cells[2]);
+      logoLink = linkEl ? linkEl.getAttribute('href') : getText(cells[2]);
     } else {
       const name = getText(cells[0]);
       const code = getText(cells[1]);
@@ -64,6 +62,7 @@ export default async function decorate(block) {
   }
 
   block.textContent = '';
+  block.className = 'kp-header';
 
   const header = document.createElement('div');
   header.className = 'kp-header-container';
@@ -74,6 +73,7 @@ export default async function decorate(block) {
 
   const logoLinkEl = document.createElement('a');
   logoLinkEl.href = logoLink;
+  logoLinkEl.setAttribute('aria-label', 'Home');
 
   if (desktopLogo) {
     desktopLogo.classList.add('kp-logo-desktop');
@@ -93,23 +93,30 @@ export default async function decorate(block) {
 
   const label = document.createElement('span');
   label.className = 'kp-language-label';
+  label.setAttribute('aria-hidden', 'false');
 
   const button = document.createElement('button');
   button.className = 'kp-language-button';
+  button.setAttribute('aria-haspopup', 'listbox');
+  button.setAttribute('aria-expanded', 'false');
 
   const menu = document.createElement('div');
   menu.className = 'kp-language-menu';
+  menu.setAttribute('role', 'listbox');
 
   let current = languages[0];
 
   function updateUI(lang) {
     button.textContent = lang.name;
+    button.setAttribute('aria-expanded', 'false');
     label.textContent = lang.label || 'Language';
 
     menu.querySelectorAll('.kp-language-option').forEach((opt) => {
       opt.classList.remove('active');
+      opt.setAttribute('aria-selected', 'false');
       if (opt.dataset.code === lang.code) {
         opt.classList.add('active');
+        opt.setAttribute('aria-selected', 'true');
       }
     });
   }
@@ -119,12 +126,15 @@ export default async function decorate(block) {
     opt.className = 'kp-language-option';
     opt.textContent = lang.name;
     opt.dataset.code = lang.code;
+    opt.setAttribute('role', 'option');
+    opt.setAttribute('aria-selected', lang.code === current.code);
 
     opt.onclick = (e) => {
       e.stopPropagation();
       current = lang;
       updateUI(lang);
       menu.classList.remove('open');
+      button.focus();
     };
 
     menu.appendChild(opt);
@@ -132,11 +142,26 @@ export default async function decorate(block) {
 
   button.onclick = (e) => {
     e.stopPropagation();
-    menu.classList.toggle('open');
+    const isOpen = menu.classList.toggle('open');
+    button.setAttribute('aria-expanded', isOpen);
   };
 
-  document.addEventListener('click', () => {
-    menu.classList.remove('open');
+  button.onkeydown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const isOpen = menu.classList.toggle('open');
+      button.setAttribute('aria-expanded', isOpen);
+    } else if (e.key === 'Escape') {
+      menu.classList.remove('open');
+      button.setAttribute('aria-expanded', 'false');
+    }
+  };
+
+  document.addEventListener('click', (e) => {
+    if (!langWrapper.contains(e.target)) {
+      menu.classList.remove('open');
+      button.setAttribute('aria-expanded', 'false');
+    }
   });
 
   updateUI(current);
