@@ -1,7 +1,4 @@
 export default async function decorate(block) {
-  const headerBlock = document.querySelector('header .header');
-  if (headerBlock) headerBlock.style.display = 'none';
-
   const rows = Array.from(block.children);
 
   let desktopLogo = null;
@@ -11,14 +8,41 @@ export default async function decorate(block) {
 
   const getText = (el) => el?.textContent?.trim() || '';
 
+  const fixImageUrls = (element) => {
+    if (!element) return;
+
+    // Fix <img src>
+    const img = element.querySelector('img');
+    if (img && img.getAttribute('src')?.startsWith('./')) {
+      img.src = new URL(img.getAttribute('src'), window.location.href).href;
+    }
+
+    // Fix <source srcset>
+    element.querySelectorAll('source').forEach((source) => {
+      const srcset = source.getAttribute('srcset');
+      if (srcset && srcset.startsWith('./')) {
+        source.srcset = new URL(srcset, window.location.href).href;
+      }
+    });
+  };
+
+  const getImage = (cell) => {
+    const el = cell?.querySelector('picture, img');
+    if (!el) return null;
+
+    const clone = el.cloneNode(true);
+    fixImageUrls(clone); // ✅ important
+    return clone;
+  };
+
   rows.forEach((row, index) => {
     const cells = row.querySelectorAll(':scope > div');
 
-    if (index === 0) return; // skip block name row
+    if (index === 0) return;
 
     if (index === 1) {
-      desktopLogo = cells[0];
-      mobileLogo = cells[1];
+      desktopLogo = getImage(cells[0]);
+      mobileLogo = getImage(cells[1]);
 
       const linkEl = cells[2]?.querySelector('a');
       logoLink = linkEl
@@ -35,7 +59,6 @@ export default async function decorate(block) {
     }
   });
 
-  // ✅ fallback safety (prevents crash)
   if (!languages.length) {
     languages.push({ name: 'English', code: 'en', label: 'Language' });
   }
@@ -45,10 +68,7 @@ export default async function decorate(block) {
   const header = document.createElement('div');
   header.className = 'kp-header-container';
 
-  /* ========================= */
   /* LOGO */
-  /* ========================= */
-
   const brand = document.createElement('div');
   brand.className = 'kp-header-brand';
 
@@ -56,23 +76,18 @@ export default async function decorate(block) {
   logoLinkEl.href = logoLink;
 
   if (desktopLogo) {
-    const d = desktopLogo.cloneNode(true);
-    d.classList.add('kp-logo-desktop');
-    logoLinkEl.appendChild(d);
+    desktopLogo.classList.add('kp-logo-desktop');
+    logoLinkEl.appendChild(desktopLogo);
   }
 
   if (mobileLogo) {
-    const m = mobileLogo.cloneNode(true);
-    m.classList.add('kp-logo-mobile');
-    logoLinkEl.appendChild(m);
+    mobileLogo.classList.add('kp-logo-mobile');
+    logoLinkEl.appendChild(mobileLogo);
   }
 
   brand.appendChild(logoLinkEl);
 
-  /* ========================= */
   /* LANGUAGE */
-  /* ========================= */
-
   const langWrapper = document.createElement('div');
   langWrapper.className = 'kp-language-wrapper';
 
@@ -81,7 +96,6 @@ export default async function decorate(block) {
 
   const button = document.createElement('button');
   button.className = 'kp-language-button';
-  button.setAttribute('aria-expanded', 'false');
 
   const menu = document.createElement('div');
   menu.className = 'kp-language-menu';
@@ -89,8 +103,6 @@ export default async function decorate(block) {
   let current = languages[0];
 
   function updateUI(lang) {
-    if (!lang) return; // ✅ extra safety
-
     button.textContent = lang.name;
     label.textContent = lang.label || 'Language';
 
@@ -113,7 +125,6 @@ export default async function decorate(block) {
       current = lang;
       updateUI(lang);
       menu.classList.remove('open');
-      button.setAttribute('aria-expanded', 'false');
     };
 
     menu.appendChild(opt);
@@ -122,12 +133,10 @@ export default async function decorate(block) {
   button.onclick = (e) => {
     e.stopPropagation();
     menu.classList.toggle('open');
-    button.setAttribute('aria-expanded', menu.classList.contains('open'));
   };
 
   document.addEventListener('click', () => {
     menu.classList.remove('open');
-    button.setAttribute('aria-expanded', 'false');
   });
 
   updateUI(current);
@@ -137,10 +146,6 @@ export default async function decorate(block) {
   const langDesktop = document.createElement('div');
   langDesktop.className = 'kp-header-language';
   langDesktop.appendChild(langWrapper);
-
-  /* ========================= */
-  /* FINAL */
-  /* ========================= */
 
   header.append(brand, langDesktop);
   block.appendChild(header);
