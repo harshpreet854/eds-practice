@@ -23,7 +23,7 @@
 .kp-header-brand {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 0;
   font-size: var(--heading-font-size-s);
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -32,7 +32,7 @@
 }
 
 .kp-header-logo {
-  height: 40px;
+  height: 32px;
   width: auto;
   flex-shrink: 0;
 }
@@ -165,11 +165,11 @@
 
   .kp-header-brand {
     font-size: 18px;
-    gap: 20px;
+    gap: 0;
   }
 
   .kp-header-logo {
-    height: 48px;
+    height: 38px;
   }
 
   .kp-language-label {
