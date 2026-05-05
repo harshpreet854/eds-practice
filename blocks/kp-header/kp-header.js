@@ -1,6 +1,4 @@
 export default async function decorate(block) {
-  const rows = Array.from(block.querySelectorAll(':scope > div'));
-
   let desktopLogo = null;
   let mobileLogo = null;
   let logoLink = '#';
@@ -28,7 +26,7 @@ export default async function decorate(block) {
     if (!cell) return null;
 
     let el = cell.querySelector('picture');
-    if (!el) el = cell.querySelector('img');
+    if (!el) el = cell.querySelector('img:not(.ProseMirror-separator)');
     if (!el) return null;
 
     const clone = el.cloneNode(true);
@@ -36,8 +34,28 @@ export default async function decorate(block) {
     return clone;
   };
 
-  rows.forEach((row, index) => {
-    const cells = row.querySelectorAll(':scope > div');
+  // Detect if it's a table or divs
+  const table = block.querySelector('table');
+  let rows = [];
+
+  if (table) {
+    // Handle TABLE structure
+    console.log('Processing TABLE structure');
+    const trs = table.querySelectorAll('tbody tr');
+    rows = Array.from(trs).map((tr) => Array.from(tr.querySelectorAll('td')));
+    // Skip header row (first row with colspan)
+    rows = rows.slice(1);
+  } else {
+    // Handle DIV structure
+    console.log('Processing DIV structure');
+    rows = Array.from(block.querySelectorAll(':scope > div')).map((row) =>
+      Array.from(row.querySelectorAll(':scope > div'))
+    );
+  }
+
+  console.log('Total rows:', rows.length);
+
+  rows.forEach((cells, index) => {
     console.log(`=== Row ${index} ===`);
     console.log(`Cells count: ${cells.length}`);
 
@@ -46,12 +64,10 @@ export default async function decorate(block) {
       desktopLogo = getImage(cells[0]);
       mobileLogo = getImage(cells[1]);
 
-      // DEBUG: Log the third cell structure
+      // Extract link from third cell
       if (cells[2]) {
         console.log('Cell 2 innerHTML:', cells[2].innerHTML);
         console.log('Cell 2 textContent:', cells[2].textContent);
-
-        // Try all possible link extraction methods
 
         // Method 1: Direct <a> tag
         let linkEl = cells[2].querySelector('a');
