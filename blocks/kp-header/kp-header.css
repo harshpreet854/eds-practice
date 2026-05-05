@@ -15,11 +15,6 @@
     margin: 0 auto;
 }
 
-/* Hide original block content - only show the decorated version */
-.kp-header > div {
-    display: none;
-}
-
 /* Logo */
 .kp-header-brand a {
     display: flex;
