@@ -201,3 +201,18 @@
         display: flex;
     }
 }
+
+/* Desktop vs Mobile logo */
+.kp-logo-mobile {
+    display: none;
+}
+
+@media (width < 600px) {
+    .kp-logo-desktop {
+        display: none;
+    }
+
+    .kp-logo-mobile {
+        display: block;
+    }
+}

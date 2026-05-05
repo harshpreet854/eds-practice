@@ -4,17 +4,23 @@ export default async function decorate(block) {
 
   const rows = Array.from(block.children);
 
-  let logoElement = null;
-  let logoLink = '';
+  let desktopLogo = null;
+  let mobileLogo = null;
+  let logoLink = '#';
   const languages = [];
 
   rows.forEach((row, index) => {
     const cells = row.querySelectorAll(':scope > div');
 
     if (index === 0) {
-      logoElement = cells[0]?.querySelector('picture, img, svg');
+      desktopLogo = cells[0]?.querySelector('picture, img, svg');
+    } else if (index === 1) {
+      mobileLogo = cells[0]?.querySelector('picture, img, svg');
+    } else if (index === 2) {
       const linkEl = cells[0]?.querySelector('a');
-      logoLink = linkEl ? linkEl.getAttribute('href') : '';
+      logoLink = linkEl
+        ? linkEl.getAttribute('href')
+        : cells[0]?.textContent.trim();
     } else {
       const name = cells[0]?.textContent.trim();
       const code = cells[1]?.textContent.trim();
@@ -35,18 +41,35 @@ export default async function decorate(block) {
   const header = document.createElement('div');
   header.className = 'kp-header-container';
 
-  /* Brand */
+  /* ========================= */
+  /* LOGO (Desktop + Mobile) */
+  /* ========================= */
+
   const brand = document.createElement('div');
   brand.className = 'kp-header-brand';
 
-  if (logoElement) {
-    const link = document.createElement('a');
-    link.href = logoLink || '#';
-    link.appendChild(logoElement.cloneNode(true));
-    brand.appendChild(link);
+  const logoLinkEl = document.createElement('a');
+  logoLinkEl.href = logoLink;
+  logoLinkEl.className = 'kp-header-logo-link';
+
+  if (desktopLogo) {
+    const dLogo = desktopLogo.cloneNode(true);
+    dLogo.classList.add('kp-logo-desktop');
+    logoLinkEl.appendChild(dLogo);
   }
 
-  /* Language UI (single instance reused) */
+  if (mobileLogo) {
+    const mLogo = mobileLogo.cloneNode(true);
+    mLogo.classList.add('kp-logo-mobile');
+    logoLinkEl.appendChild(mLogo);
+  }
+
+  brand.appendChild(logoLinkEl);
+
+  /* ========================= */
+  /* LANGUAGE */
+  /* ========================= */
+
   const langWrapper = document.createElement('div');
   langWrapper.className = 'kp-language-wrapper';
 
@@ -101,7 +124,10 @@ export default async function decorate(block) {
   langDesktop.className = 'kp-header-language';
   langDesktop.appendChild(langWrapper);
 
-  /* Mobile Menu Button */
+  /* ========================= */
+  /* MOBILE MENU */
+  /* ========================= */
+
   const menuBtn = document.createElement('button');
   menuBtn.className = 'kp-menu-button';
   menuBtn.innerHTML = `
@@ -109,7 +135,6 @@ export default async function decorate(block) {
     <span class="kp-menu-text">Menu</span>
   `;
 
-  /* Mobile Overlay */
   const mobileMenu = document.createElement('div');
   mobileMenu.className = 'kp-mobile-menu';
 
@@ -125,7 +150,6 @@ export default async function decorate(block) {
 
   mobileMenu.appendChild(mobileHeader);
 
-  /* Move SAME language UI into mobile when opened */
   menuBtn.onclick = () => {
     mobileMenu.appendChild(langWrapper);
     mobileMenu.classList.add('open');
@@ -138,7 +162,10 @@ export default async function decorate(block) {
 
   document.body.appendChild(mobileMenu);
 
-  /* Assemble */
+  /* ========================= */
+  /* ASSEMBLE */
+  /* ========================= */
+
   header.appendChild(brand);
   header.appendChild(menuBtn);
   header.appendChild(langDesktop);
