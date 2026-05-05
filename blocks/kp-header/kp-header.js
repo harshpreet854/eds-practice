@@ -1,5 +1,4 @@
 export default async function decorate(block) {
-  // Get all direct child rows (each <div> with 3 children)
   const rows = Array.from(block.children);
 
   let desktopLogo = null;
@@ -12,13 +11,11 @@ export default async function decorate(block) {
   const fixImageUrls = (element) => {
     if (!element) return;
 
-    // Fix <img src>
     const img = element.querySelector('img');
     if (img && img.getAttribute('src')?.startsWith('./')) {
       img.src = new URL(img.getAttribute('src'), window.location.href).href;
     }
 
-    // Fix <source srcset>
     element.querySelectorAll('source').forEach((source) => {
       const srcset = source.getAttribute('srcset');
       if (srcset && srcset.startsWith('./')) {
@@ -30,7 +27,8 @@ export default async function decorate(block) {
   const getImage = (cell) => {
     if (!cell) return null;
 
-    const el = cell.querySelector('picture, img');
+    let el = cell.querySelector('picture');
+    if (!el) el = cell.querySelector('img');
     if (!el) return null;
 
     const clone = el.cloneNode(true);
@@ -41,18 +39,13 @@ export default async function decorate(block) {
   rows.forEach((row, index) => {
     const cells = row.querySelectorAll(':scope > div');
 
-    if (cells.length === 0) return;
-
-    // First row: logos and link
     if (index === 0) {
       desktopLogo = getImage(cells[0]);
       mobileLogo = getImage(cells[1]);
 
-      // Extract link from third cell
       const linkEl = cells[2]?.querySelector('a');
       logoLink = linkEl ? linkEl.getAttribute('href') : getText(cells[2]);
     } else {
-      // Subsequent rows: languages
       const name = getText(cells[0]);
       const code = getText(cells[1]);
       const label = getText(cells[2]);
@@ -63,12 +56,10 @@ export default async function decorate(block) {
     }
   });
 
-  // Default if no languages found
   if (!languages.length) {
     languages.push({ name: 'English', code: 'en', label: 'Language' });
   }
 
-  // Clear and rebuild
   block.textContent = '';
   block.className = 'kp-header';
 
@@ -94,7 +85,7 @@ export default async function decorate(block) {
 
   brand.appendChild(logoLinkEl);
 
-  /* ===== LANGUAGE DROPDOWN ===== */
+  /* ===== DESKTOP LANGUAGE DROPDOWN ===== */
   const langWrapper = document.createElement('div');
   langWrapper.className = 'kp-language-wrapper';
 
@@ -122,9 +113,17 @@ export default async function decorate(block) {
       opt.classList.toggle('active', isActive);
       opt.setAttribute('aria-selected', isActive);
     });
+
+    // Update mobile menu if it exists
+    const mobileMenu = document.querySelector('.kp-mobile-menu');
+    if (mobileMenu) {
+      const mobileLangButton = mobileMenu.querySelector('.kp-mobile-language-button');
+      if (mobileLangButton) {
+        mobileLangButton.textContent = lang.name;
+      }
+    }
   }
 
-  // Create language options
   languages.forEach((lang) => {
     const opt = document.createElement('button');
     opt.className = 'kp-language-option';
@@ -145,14 +144,12 @@ export default async function decorate(block) {
     menu.appendChild(opt);
   });
 
-  // Toggle dropdown
   button.onclick = (e) => {
     e.stopPropagation();
     const isOpen = menu.classList.toggle('open');
     button.setAttribute('aria-expanded', isOpen);
   };
 
-  // Close on outside click
   document.addEventListener('click', () => {
     if (menu.classList.contains('open')) {
       menu.classList.remove('open');
@@ -160,7 +157,6 @@ export default async function decorate(block) {
     }
   });
 
-  // Keyboard support
   button.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -181,4 +177,142 @@ export default async function decorate(block) {
 
   header.append(brand, langDesktop);
   block.appendChild(header);
+
+  /* ===== HAMBURGER MENU (MOBILE) ===== */
+  const hamburger = document.createElement('button');
+  hamburger.className = 'kp-hamburger-button';
+  hamburger.setAttribute('aria-label', 'Open menu');
+  hamburger.setAttribute('aria-expanded', 'false');
+  hamburger.innerHTML = `
+    <span class="kp-hamburger-icon"></span>
+    <span class="kp-hamburger-text">Menu</span>
+  `;
+
+  const mobileMenuBackdrop = document.createElement('div');
+  mobileMenuBackdrop.className = 'kp-mobile-backdrop';
+
+  const mobileMenu = document.createElement('div');
+  mobileMenu.className = 'kp-mobile-menu';
+
+  const mobileHeader = document.createElement('div');
+  mobileHeader.className = 'kp-mobile-header';
+
+  const mobileBrand = document.createElement('div');
+  mobileBrand.className = 'kp-mobile-brand';
+  const mobileLogoLinkEl = document.createElement('a');
+  mobileLogoLinkEl.href = logoLink;
+
+  if (mobileLogo) {
+    const mobileLogoClone = mobileLogo.cloneNode(true);
+    mobileLogoClone.classList.remove('kp-logo-mobile');
+    mobileLogoClone.classList.add('kp-mobile-logo');
+    mobileLogoLinkEl.appendChild(mobileLogoClone);
+  }
+
+  mobileBrand.appendChild(mobileLogoLinkEl);
+
+  const closeButton = document.createElement('button');
+  closeButton.className = 'kp-close-button';
+  closeButton.setAttribute('aria-label', 'Close menu');
+  closeButton.innerHTML = `
+    <span class="kp-close-icon">✕</span>
+    <span class="kp-close-text">Close</span>
+  `;
+
+  mobileHeader.append(mobileBrand, closeButton);
+  mobileMenu.appendChild(mobileHeader);
+
+  /* Mobile Language Menu */
+  const mobileLanguageSection = document.createElement('div');
+  mobileLanguageSection.className = 'kp-mobile-language-section';
+
+  const mobileLanguageLabel = document.createElement('div');
+  mobileLanguageLabel.className = 'kp-mobile-language-label';
+  mobileLanguageLabel.textContent = current.label || 'Language';
+
+  const mobileLanguageButton = document.createElement('button');
+  mobileLanguageButton.className = 'kp-mobile-language-button';
+  mobileLanguageButton.textContent = current.name;
+  mobileLanguageButton.setAttribute('aria-haspopup', 'listbox');
+  mobileLanguageButton.setAttribute('aria-expanded', 'false');
+
+  const mobileLanguageDropdown = document.createElement('div');
+  mobileLanguageDropdown.className = 'kp-mobile-language-dropdown';
+  mobileLanguageDropdown.setAttribute('role', 'listbox');
+
+  languages.forEach((lang) => {
+    const opt = document.createElement('button');
+    opt.className = 'kp-mobile-language-option';
+    opt.textContent = lang.name;
+    opt.dataset.code = lang.code;
+    opt.setAttribute('role', 'option');
+    opt.setAttribute('aria-selected', lang.code === current.code);
+
+    if (lang.code === current.code) {
+      opt.classList.add('active');
+    }
+
+    opt.onclick = (e) => {
+      e.stopPropagation();
+      current = lang;
+
+      mobileLanguageButton.textContent = lang.name;
+      mobileLanguageLabel.textContent = lang.label || 'Language';
+
+      mobileLanguageDropdown.querySelectorAll('.kp-mobile-language-option').forEach((o) => {
+        o.classList.remove('active');
+        o.setAttribute('aria-selected', 'false');
+      });
+
+      opt.classList.add('active');
+      opt.setAttribute('aria-selected', 'true');
+
+      mobileLanguageDropdown.classList.remove('open');
+      mobileLanguageButton.setAttribute('aria-expanded', 'false');
+
+      updateUI(lang);
+    };
+
+    mobileLanguageDropdown.appendChild(opt);
+  });
+
+  mobileLanguageButton.onclick = (e) => {
+    e.stopPropagation();
+    const isOpen = mobileLanguageDropdown.classList.toggle('open');
+    mobileLanguageButton.setAttribute('aria-expanded', isOpen);
+  };
+
+  mobileLanguageSection.append(mobileLanguageLabel, mobileLanguageButton, mobileLanguageDropdown);
+  mobileMenu.appendChild(mobileLanguageSection);
+
+  /* Close menu handlers */
+  function closeMenu() {
+    hamburger.setAttribute('aria-expanded', 'false');
+    mobileMenuBackdrop.classList.remove('open');
+    mobileMenu.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  closeButton.addEventListener('click', closeMenu);
+  mobileMenuBackdrop.addEventListener('click', closeMenu);
+
+  hamburger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
+    hamburger.setAttribute('aria-expanded', !isOpen);
+    mobileMenuBackdrop.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+    document.body.style.overflow = !isOpen ? 'hidden' : '';
+  });
+
+  /* Close on escape */
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+      closeMenu();
+    }
+  });
+
+  block.appendChild(hamburger);
+  block.appendChild(mobileMenuBackdrop);
+  block.appendChild(mobileMenu);
 }

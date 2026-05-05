@@ -3,6 +3,7 @@
     color: white;
     width: 100%;
     font-family: var(--body-font-family);
+    position: relative;
 }
 
 /* Container */
@@ -38,26 +39,26 @@
 
 /* MOBILE VIEW (default) */
 .kp-logo-desktop {
-    display: none !important;  /* Hide desktop logo on mobile */
+    display: none !important;
 }
 
 .kp-logo-mobile {
-    display: block !important;  /* Show mobile logo on mobile */
+    display: block !important;
 }
 
-/* DESKTOP VIEW */
+/* On desktop: show desktop, hide mobile */
 @media (min-width: 600px) {
     .kp-logo-desktop {
-        display: block !important;  /* Show desktop logo on desktop */
+        display: block !important;
     }
 
     .kp-logo-mobile {
-        display: none !important;   /* Hide mobile logo on desktop */
+        display: none !important;
     }
 }
 
 /* ========================= */
-/* LANGUAGE */
+/* DESKTOP LANGUAGE */
 /* ========================= */
 
 .kp-header-language {
@@ -165,11 +166,267 @@
     border-bottom: 1px solid #eee;
 }
 
+/* Hide desktop language on mobile */
+@media (max-width: 599px) {
+    .kp-header-language {
+        display: none;
+    }
+}
+
+/* ========================= */
+/* HAMBURGER BUTTON (MOBILE) */
+/* ========================= */
+
+.kp-hamburger-button {
+    display: none;
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+@media (max-width: 599px) {
+    .kp-hamburger-button {
+        display: flex;
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
+
+.kp-hamburger-icon {
+    display: block;
+    width: 24px;
+    height: 18px;
+    position: relative;
+}
+
+.kp-hamburger-icon::before,
+.kp-hamburger-icon::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    left: 0;
+}
+
+.kp-hamburger-icon::before {
+    top: 0;
+}
+
+.kp-hamburger-icon::after {
+    bottom: 0;
+}
+
+.kp-hamburger-icon {
+    background: linear-gradient(to bottom, currentColor 0%, currentColor 2px, transparent 2px, transparent 8px, currentColor 8px, currentColor 10px, transparent 10px, transparent 16px, currentColor 16px, currentColor 18px);
+    background-size: 100% 100%;
+}
+
+/* ========================= */
+/* MOBILE MENU */
+/* ========================= */
+
+.kp-mobile-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    display: none;
+}
+
+.kp-mobile-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+    display: block;
+}
+
+.kp-mobile-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100vh;
+    background: #0c2d57;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+}
+
+.kp-mobile-menu.open {
+    transform: translateX(0);
+}
+
+.kp-mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    gap: 16px;
+}
+
+.kp-mobile-brand {
+    flex: 1;
+}
+
+.kp-mobile-brand a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.kp-mobile-logo {
+    height: 32px;
+    width: auto;
+    display: block;
+    max-width: 100%;
+}
+
+/* Close Button */
+.kp-close-button {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    padding: 8px;
+    min-width: 60px;
+    white-space: nowrap;
+}
+
+.kp-close-button:hover {
+    opacity: 0.8;
+}
+
+.kp-close-icon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+/* Mobile Language Section */
+.kp-mobile-language-section {
+    padding: 24px 16px;
+}
+
+.kp-mobile-language-label {
+    font-size: 14px;
+    margin-bottom: 12px;
+    opacity: 0.8;
+}
+
+.kp-mobile-language-button {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    color: white;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.kp-mobile-language-button:hover {
+    border-color: rgba(255, 255, 255, 1);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.kp-mobile-language-button::after {
+    content: '▾';
+    font-size: 12px;
+    transition: transform 0.2s ease;
+}
+
+.kp-mobile-language-button[aria-expanded="true"]::after {
+    transform: rotate(180deg);
+}
+
+/* Mobile Language Dropdown */
+.kp-mobile-language-dropdown {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    margin-top: 12px;
+    display: none;
+    overflow: hidden;
+}
+
+.kp-mobile-language-dropdown.open {
+    display: block;
+}
+
+.kp-mobile-language-option {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+    color: white;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.kp-mobile-language-option:last-child {
+    border-bottom: none;
+}
+
+.kp-mobile-language-option:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.kp-mobile-language-option.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+}
+
+.kp-mobile-language-option.active::after {
+    content: '✔';
+    color: #fff;
+}
+
+/* Hide on desktop */
+@media (min-width: 600px) {
+    .kp-hamburger-button,
+    .kp-mobile-menu,
+    .kp-mobile-backdrop {
+        display: none !important;
+    }
+}
+
 /* Mobile optimizations */
 @media (max-width: 599px) {
     .kp-header-container {
         padding: 12px 16px;
         gap: 12px;
+        padding-right: 80px;
     }
 
     .kp-language-label {
