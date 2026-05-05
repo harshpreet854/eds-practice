@@ -117,3 +117,26 @@
 .kp-language-option:not(:last-child) {
     border-bottom: 1px solid #eee;
 }
+
+/* Fix logo rendering */
+.kp-header picture,
+.kp-header img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Desktop vs Mobile logo */
+.kp-logo-mobile {
+    display: none;
+}
+
+@media (width < 600px) {
+    .kp-logo-desktop {
+        display: none;
+    }
+
+    .kp-logo-mobile {
+        display: block;
+    }
+}

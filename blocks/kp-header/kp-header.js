@@ -4,22 +4,28 @@ export default async function decorate(block) {
 
   const rows = Array.from(block.children);
 
-  let logoNode = null;
+  let desktopLogo = null;
+  let mobileLogo = null;
   let logoLink = '#';
   const languages = [];
 
   rows.forEach((row, index) => {
     const cells = row.querySelectorAll(':scope > div');
 
-    if (index === 0) {
-      // ✅ Use real DOM node (not innerHTML)
-      logoNode = cells[0];
+    // Skip first row (block name)
+    if (index === 0) return;
 
-      const linkEl = cells[1]?.querySelector('a');
+    if (index === 1) {
+      // Row 1 → logos + link
+      desktopLogo = cells[0];
+      mobileLogo = cells[1];
+
+      const linkEl = cells[2]?.querySelector('a');
       logoLink = linkEl
         ? linkEl.getAttribute('href')
-        : cells[1]?.textContent.trim();
+        : cells[2]?.textContent.trim();
     } else {
+      // Language rows
       const name = cells[0]?.textContent.trim();
       const code = cells[1]?.textContent.trim();
       const label = cells[2]?.textContent.trim();
@@ -29,10 +35,6 @@ export default async function decorate(block) {
       }
     }
   });
-
-  if (!languages.length) {
-    languages.push({ name: 'English', code: 'en', label: 'Language' });
-  }
 
   block.textContent = '';
 
@@ -49,9 +51,18 @@ export default async function decorate(block) {
   const logoLinkEl = document.createElement('a');
   logoLinkEl.href = logoLink;
 
-  if (logoNode) {
-    const clonedLogo = logoNode.cloneNode(true); // ✅ critical fix
-    logoLinkEl.appendChild(clonedLogo);
+  // Desktop logo
+  if (desktopLogo) {
+    const d = desktopLogo.cloneNode(true);
+    d.classList.add('kp-logo-desktop');
+    logoLinkEl.appendChild(d);
+  }
+
+  // Mobile logo
+  if (mobileLogo) {
+    const m = mobileLogo.cloneNode(true);
+    m.classList.add('kp-logo-mobile');
+    logoLinkEl.appendChild(m);
   }
 
   brand.appendChild(logoLinkEl);
