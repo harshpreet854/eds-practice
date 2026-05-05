@@ -10,9 +10,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 32px;
-    gap: 20px;
-    flex-wrap: wrap;
+    padding: 16px 24px;
+    gap: 16px;
+}
+
+@media (width >= 600px) {
+    .kp-header-container {
+        padding: 16px 32px;
+        gap: 24px;
+    }
 }
 
 /* Logo */
@@ -33,27 +39,58 @@
     height: auto;
 }
 
+/* Fix logo rendering */
+.kp-header picture,
+.kp-header img {
+    display: block;
+    height: 38px;
+    width: auto;
+}
+
+/* Desktop vs Mobile logo */
+.kp-logo-mobile {
+    display: block;
+}
+
+.kp-logo-desktop {
+    display: none;
+}
+
+@media (width >= 600px) {
+    .kp-logo-mobile {
+        display: none;
+    }
+
+    .kp-logo-desktop {
+        display: block;
+    }
+}
+
 /* ========================= */
 /* LANGUAGE */
 /* ========================= */
 
 .kp-header-language {
     display: flex;
-    align-items: center;
+    flex-shrink: 0;
 }
 
 .kp-language-wrapper {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .kp-language-label {
     font-size: 14px;
     font-weight: 500;
-    color: white;
-    min-width: fit-content;
+}
+
+@media (width < 480px) {
+    .kp-language-label {
+        display: none;
+    }
 }
 
 /* Button */
@@ -65,21 +102,25 @@
     border-radius: 6px;
     font-size: 14px;
     cursor: pointer;
+    font-weight: 500;
     white-space: nowrap;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: border-color 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .kp-language-button:hover {
     border-color: rgba(255, 255, 255, 1);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.kp-language-button:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline-offset: 2px;
 }
 
 /* Caret */
 .kp-language-button::after {
     content: '▾';
+    margin-left: 8px;
     font-size: 12px;
     transition: transform 0.2s ease;
     display: inline-block;
@@ -96,7 +137,7 @@
     right: 0;
     background-color: #ffffff;
     border-radius: 6px;
-    min-width: 180px;
+    min-width: 160px;
     display: none;
     z-index: 1000;
     overflow: hidden;
@@ -106,6 +147,18 @@
 
 .kp-language-menu.open {
     display: block;
+    animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Options */
@@ -122,10 +175,16 @@
     justify-content: space-between;
     align-items: center;
     transition: background-color 0.15s ease;
+    font-family: inherit;
 }
 
 .kp-language-option:hover {
     background-color: #f5f8fc;
+}
+
+.kp-language-option:focus {
+    outline: 2px solid #0d5cab;
+    outline-offset: -2px;
 }
 
 .kp-language-option.active {
@@ -141,78 +200,4 @@
 
 .kp-language-option:not(:last-child) {
     border-bottom: 1px solid #eee;
-}
-
-/* Fix logo rendering */
-.kp-header picture,
-.kp-header img {
-    display: block;
-    height: 38px;
-    width: auto;
-}
-
-/* Desktop vs Mobile logo */
-.kp-logo-mobile {
-    display: none;
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-    .kp-header-container {
-        padding: 12px 16px;
-    }
-
-    .kp-logo-desktop {
-        display: none;
-    }
-
-    .kp-logo-mobile {
-        display: block;
-    }
-
-    .kp-header picture,
-    .kp-header img {
-        height: 32px;
-    }
-
-    .kp-language-wrapper {
-        gap: 8px;
-    }
-
-    .kp-language-label {
-        font-size: 13px;
-    }
-
-    .kp-language-button {
-        padding: 6px 12px;
-        font-size: 13px;
-    }
-
-    .kp-language-menu {
-        min-width: 160px;
-    }
-
-    .kp-language-option {
-        padding: 10px 14px;
-        font-size: 13px;
-    }
-}
-
-@media (max-width: 480px) {
-    .kp-header-container {
-        padding: 10px 12px;
-    }
-
-    .kp-language-label {
-        display: none;
-    }
-
-    .kp-language-button {
-        padding: 6px 10px;
-        font-size: 12px;
-    }
-
-    .kp-language-button::after {
-        font-size: 10px;
-    }
 }

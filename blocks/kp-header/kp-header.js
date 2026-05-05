@@ -11,13 +11,11 @@ export default async function decorate(block) {
   const fixImageUrls = (element) => {
     if (!element) return;
 
-    // Fix <img src>
     const img = element.querySelector('img');
     if (img && img.getAttribute('src')?.startsWith('./')) {
       img.src = new URL(img.getAttribute('src'), window.location.href).href;
     }
 
-    // Fix <source srcset>
     element.querySelectorAll('source').forEach((source) => {
       const srcset = source.getAttribute('srcset');
       if (srcset && srcset.startsWith('./')) {
@@ -45,7 +43,9 @@ export default async function decorate(block) {
       mobileLogo = getImage(cells[1]);
 
       const linkEl = cells[2]?.querySelector('a');
-      logoLink = linkEl ? linkEl.getAttribute('href') : getText(cells[2]);
+      logoLink = linkEl
+        ? linkEl.getAttribute('href')
+        : getText(cells[2]);
     } else {
       const name = getText(cells[0]);
       const code = getText(cells[1]);
@@ -73,7 +73,6 @@ export default async function decorate(block) {
 
   const logoLinkEl = document.createElement('a');
   logoLinkEl.href = logoLink;
-  logoLinkEl.setAttribute('aria-label', 'Home');
 
   if (desktopLogo) {
     desktopLogo.classList.add('kp-logo-desktop');
@@ -93,11 +92,10 @@ export default async function decorate(block) {
 
   const label = document.createElement('span');
   label.className = 'kp-language-label';
-  label.setAttribute('aria-hidden', 'false');
 
   const button = document.createElement('button');
   button.className = 'kp-language-button';
-  button.setAttribute('aria-haspopup', 'listbox');
+  button.setAttribute('aria-haspopup', 'true');
   button.setAttribute('aria-expanded', 'false');
 
   const menu = document.createElement('div');
@@ -121,20 +119,19 @@ export default async function decorate(block) {
     });
   }
 
-  languages.forEach((lang) => {
+  languages.forEach((lang, index) => {
     const opt = document.createElement('button');
     opt.className = 'kp-language-option';
     opt.textContent = lang.name;
     opt.dataset.code = lang.code;
     opt.setAttribute('role', 'option');
-    opt.setAttribute('aria-selected', lang.code === current.code);
+    opt.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
 
     opt.onclick = (e) => {
       e.stopPropagation();
       current = lang;
       updateUI(lang);
       menu.classList.remove('open');
-      button.focus();
     };
 
     menu.appendChild(opt);
@@ -143,22 +140,20 @@ export default async function decorate(block) {
   button.onclick = (e) => {
     e.stopPropagation();
     const isOpen = menu.classList.toggle('open');
-    button.setAttribute('aria-expanded', isOpen);
+    button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   };
 
-  button.onkeydown = (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      const isOpen = menu.classList.toggle('open');
-      button.setAttribute('aria-expanded', isOpen);
-    } else if (e.key === 'Escape') {
+  // Close menu on outside click
+  document.addEventListener('click', (e) => {
+    if (!langWrapper.contains(e.target)) {
       menu.classList.remove('open');
       button.setAttribute('aria-expanded', 'false');
     }
-  };
+  });
 
-  document.addEventListener('click', (e) => {
-    if (!langWrapper.contains(e.target)) {
+  // Keyboard support
+  button.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape') {
       menu.classList.remove('open');
       button.setAttribute('aria-expanded', 'false');
     }
