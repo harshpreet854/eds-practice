@@ -340,6 +340,7 @@ export default async function decorate(block) {
   desktopLangWrapper.className = 'kp-header-language';
   desktopLangWrapper.appendChild(langWrapper);
 
-  header.append(hamburger, brand, desktopLangWrapper);
+  // Order: brand (logo), desktop language, hamburger (mobile menu)
+  header.append(brand, desktopLangWrapper, hamburger);
   block.append(header, mobileMenuOverlay);
 }
