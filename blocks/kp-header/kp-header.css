@@ -325,7 +325,7 @@
 
 .kp-mobile-language-section .kp-language-option.active {
     background-color: rgba(255, 255, 255, 0.2);
-    color: white;
+    color: #0074AD;
 }
 
 /* Hide mobile menu on desktop */
