@@ -20,13 +20,7 @@ export default async function decorate(block) {
 
     if (index === 0) {
       // First row: logo image
-      const firstCell = cells[0];
-
-      // Check if first cell contains an image
-      const img = firstCell?.querySelector('img');
-      if (img) {
-        logoElement = img.cloneNode(true);
-      }
+      logoElement = cells[0];
     } else {
       // Subsequent rows are language options
       const langName = cells[0]?.textContent.trim() || '';
