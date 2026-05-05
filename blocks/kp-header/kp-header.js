@@ -4,7 +4,7 @@ export default async function decorate(block) {
 
   const rows = Array.from(block.children);
 
-  let logoContent = null;
+  let logoNode = null;
   let logoLink = '#';
   const languages = [];
 
@@ -12,15 +12,14 @@ export default async function decorate(block) {
     const cells = row.querySelectorAll(':scope > div');
 
     if (index === 0) {
-      // Logo + link in SAME row
-      logoContent = cells[0]?.innerHTML;
+      // ✅ Use real DOM node (not innerHTML)
+      logoNode = cells[0];
 
       const linkEl = cells[1]?.querySelector('a');
       logoLink = linkEl
         ? linkEl.getAttribute('href')
         : cells[1]?.textContent.trim();
     } else {
-      // Language rows
       const name = cells[0]?.textContent.trim();
       const code = cells[1]?.textContent.trim();
       const label = cells[2]?.textContent.trim();
@@ -40,20 +39,27 @@ export default async function decorate(block) {
   const header = document.createElement('div');
   header.className = 'kp-header-container';
 
+  /* ========================= */
   /* LOGO */
+  /* ========================= */
+
   const brand = document.createElement('div');
   brand.className = 'kp-header-brand';
 
   const logoLinkEl = document.createElement('a');
   logoLinkEl.href = logoLink;
 
-  const logo = document.createElement('div');
-  logo.innerHTML = logoContent;
+  if (logoNode) {
+    const clonedLogo = logoNode.cloneNode(true); // ✅ critical fix
+    logoLinkEl.appendChild(clonedLogo);
+  }
 
-  logoLinkEl.appendChild(logo);
   brand.appendChild(logoLinkEl);
 
+  /* ========================= */
   /* LANGUAGE */
+  /* ========================= */
+
   const langWrapper = document.createElement('div');
   langWrapper.className = 'kp-language-wrapper';
 
@@ -117,7 +123,10 @@ export default async function decorate(block) {
   langDesktop.className = 'kp-header-language';
   langDesktop.appendChild(langWrapper);
 
+  /* ========================= */
   /* ASSEMBLE */
+  /* ========================= */
+
   header.append(brand, langDesktop);
   block.appendChild(header);
 }
