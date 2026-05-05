@@ -17,15 +17,15 @@ The kp-header block expects authored content structured as follows:
 ### Structure
 
 ```
-| Logo Image (complete logo with brand name) |
+| Logo (image) + Brand Name / Text | 
 | Language 1 | Language Code |
 | Language 2 | Language Code |
 ```
 
 ### Example
 
-Row 1 (Logo):
-- Cell 1: Upload the complete Kaiser Permanente logo SVG (kp-logo.svg)
+Row 1 (Brand - with logo):
+- Cell 1: Upload an image (logo) and/or add text `KAISER PERMANENTE®`
 
 Row 2 (Language Option 1):
 - Cell 1: `English`
@@ -36,12 +36,11 @@ Row 3 (Language Option 2):
 - Cell 2: `es`
 
 ### Logo Guidelines
-- Upload the complete Kaiser Permanente logo SVG file
-- The logo should include the brand icon and text
-- Recommended: Use the provided `kp-logo.svg` file
-- The logo will automatically scale to fit the header height
-- Mobile: 32px height
-- Desktop: 38px height
+- Upload your logo image in the first cell
+- Recommended size: 40px height (auto-scales width)
+- Format: PNG with transparent background works best
+- The logo will appear to the left of the brand text
+- If no logo is provided, only the brand text will display
 
 ## Markup
 
@@ -104,8 +103,9 @@ All selectors are properly scoped to the block:
 ```
 .kp-header                    /* Block container */
 ├── .kp-header-container      /* Main flex container */
-├── .kp-header-brand          /* Brand section with logo */
-│   └── .kp-header-logo       /* Logo image */
+├── .kp-header-brand          /* Brand section */
+│   ├── .kp-header-logo       /* Logo image (if present) */
+│   └── .kp-header-brand-text /* Brand text */
 └── .kp-header-language       /* Language section */
     └── .kp-language-wrapper
         ├── .kp-language-label
