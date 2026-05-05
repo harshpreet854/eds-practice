@@ -73,18 +73,17 @@ export default async function decorate(block) {
 
   const button = document.createElement('button');
   button.className = 'kp-language-button';
+  button.setAttribute('aria-expanded', 'false');
 
   const menu = document.createElement('div');
   menu.className = 'kp-language-menu';
 
   let current = languages[0];
-
-  // ✅ declare BEFORE use
   let mobileHeaderLabel = null;
 
-  function updateLanguageUI(lang) {
+  function updateUI(lang) {
     button.textContent = lang.name;
-    label.textContent = lang.label || 'Language';
+    label.textContent = lang.label;
 
     menu.querySelectorAll('.kp-language-option').forEach((opt) => {
       opt.classList.remove('active');
@@ -93,9 +92,8 @@ export default async function decorate(block) {
       }
     });
 
-    // safe check
     if (mobileHeaderLabel) {
-      mobileHeaderLabel.textContent = lang.label || 'Language';
+      mobileHeaderLabel.textContent = lang.label;
     }
   }
 
@@ -105,28 +103,29 @@ export default async function decorate(block) {
     opt.textContent = lang.name;
     opt.dataset.code = lang.code;
 
-    if (lang.code === current.code) {
-      opt.classList.add('active');
-    }
-
-    opt.addEventListener('click', (e) => {
+    opt.onclick = (e) => {
       e.stopPropagation();
       current = lang;
-      updateLanguageUI(lang);
+      updateUI(lang);
       menu.classList.remove('open');
-    });
+      button.setAttribute('aria-expanded', 'false');
+    };
 
     menu.appendChild(opt);
   });
 
-  button.addEventListener('click', (e) => {
+  button.onclick = (e) => {
     e.stopPropagation();
     menu.classList.toggle('open');
-  });
+    button.setAttribute('aria-expanded', menu.classList.contains('open'));
+  };
 
   document.addEventListener('click', () => {
     menu.classList.remove('open');
+    button.setAttribute('aria-expanded', 'false');
   });
+
+  updateUI(current);
 
   langWrapper.append(label, button, menu);
 
@@ -148,17 +147,14 @@ export default async function decorate(block) {
   const mobileHeader = document.createElement('div');
   mobileHeader.className = 'kp-mobile-header';
 
-  // ✅ NOW initialize properly
   mobileHeaderLabel = document.createElement('span');
   mobileHeaderLabel.textContent = current.label;
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'kp-close-button';
-  closeBtn.innerHTML = '✕<br/>Close';
+  closeBtn.innerHTML = '✕ Close';
 
-  mobileHeader.appendChild(mobileHeaderLabel);
-  mobileHeader.appendChild(closeBtn);
-
+  mobileHeader.append(mobileHeaderLabel, closeBtn);
   mobileMenu.appendChild(mobileHeader);
 
   menuBtn.onclick = () => {
@@ -173,13 +169,7 @@ export default async function decorate(block) {
 
   document.body.appendChild(mobileMenu);
 
-  /* INIT UI AFTER EVERYTHING EXISTS */
-  updateLanguageUI(current);
-
   /* ASSEMBLE */
-  header.appendChild(brand);
-  header.appendChild(menuBtn);
-  header.appendChild(langDesktop);
-
+  header.append(brand, menuBtn, langDesktop);
   block.appendChild(header);
 }
