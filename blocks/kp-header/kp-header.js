@@ -3,18 +3,37 @@
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
-  // Extract brand and language options from authored content
+  // Hide the regular header when kp-header is present
+  const headerBlock = document.querySelector('header .header');
+  if (headerBlock) {
+    headerBlock.style.display = 'none';
+  }
+
+  // Extract brand, logo and language options from authored content
   const rows = Array.from(block.children);
 
-  let brandContent = '';
+  let logoElement = null;
+  let brandText = 'KAISER PERMANENTE';
   const languages = [];
 
   rows.forEach((row, index) => {
     const cells = row.querySelectorAll(':scope > div');
 
     if (index === 0) {
-      // First row is brand
-      brandContent = cells[0]?.textContent.trim() || 'KAISER PERMANENTE';
+      // First row: logo and/or brand text
+      const firstCell = cells[0];
+
+      // Check if first cell contains an image
+      const img = firstCell?.querySelector('img');
+      if (img) {
+        logoElement = img.cloneNode(true);
+      }
+
+      // Get text content (excluding image)
+      const textContent = firstCell?.textContent.trim() || 'KAISER PERMANENTE';
+      if (textContent) {
+        brandText = textContent;
+      }
     } else {
       // Subsequent rows are language options
       const langName = cells[0]?.textContent.trim() || '';
@@ -41,7 +60,18 @@ export default async function decorate(block) {
   // Create brand section
   const brandSection = document.createElement('div');
   brandSection.className = 'kp-header-brand';
-  brandSection.textContent = brandContent;
+
+  // Add logo if present
+  if (logoElement) {
+    logoElement.classList.add('kp-header-logo');
+    brandSection.appendChild(logoElement);
+  }
+
+  // Add brand text
+  const brandTextElement = document.createElement('span');
+  brandTextElement.className = 'kp-header-brand-text';
+  brandTextElement.textContent = brandText;
+  brandSection.appendChild(brandTextElement);
 
   // Create language dropdown section
   const langSection = document.createElement('div');

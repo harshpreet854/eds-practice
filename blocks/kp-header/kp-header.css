@@ -23,11 +23,22 @@
 .kp-header-brand {
   display: flex;
   align-items: center;
+  gap: 16px;
   font-size: var(--heading-font-size-s);
   font-weight: 700;
   letter-spacing: 0.5px;
   line-height: 1;
   white-space: nowrap;
+}
+
+.kp-header-logo {
+  height: 40px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.kp-header-brand-text {
+  display: block;
 }
 
 /* Language Section */
@@ -154,6 +165,11 @@
 
   .kp-header-brand {
     font-size: 18px;
+    gap: 20px;
+  }
+
+  .kp-header-logo {
+    height: 48px;
   }
 
   .kp-language-label {
