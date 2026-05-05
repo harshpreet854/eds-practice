@@ -1,6 +1,6 @@
 export default async function decorate(block) {
-  // Query table rows directly from the table structure
-  const rows = Array.from(block.querySelectorAll('table tbody tr'));
+  // Get all direct child rows (each <div> with 3 children)
+  const rows = Array.from(block.children);
 
   let desktopLogo = null;
   let mobileLogo = null;
@@ -12,11 +12,13 @@ export default async function decorate(block) {
   const fixImageUrls = (element) => {
     if (!element) return;
 
-    const img = element.querySelector('img:not(.ProseMirror-separator)');
+    // Fix <img src>
+    const img = element.querySelector('img');
     if (img && img.getAttribute('src')?.startsWith('./')) {
       img.src = new URL(img.getAttribute('src'), window.location.href).href;
     }
 
+    // Fix <source srcset>
     element.querySelectorAll('source').forEach((source) => {
       const srcset = source.getAttribute('srcset');
       if (srcset && srcset.startsWith('./')) {
@@ -28,9 +30,7 @@ export default async function decorate(block) {
   const getImage = (cell) => {
     if (!cell) return null;
 
-    // Look for picture or img (skip ProseMirror separators)
-    let el = cell.querySelector('picture');
-    if (!el) el = cell.querySelector('img:not(.ProseMirror-separator)');
+    const el = cell.querySelector('picture, img');
     if (!el) return null;
 
     const clone = el.cloneNode(true);
@@ -39,13 +39,16 @@ export default async function decorate(block) {
   };
 
   rows.forEach((row, index) => {
-    const cells = row.querySelectorAll('td');
+    const cells = row.querySelectorAll(':scope > div');
 
-    // First row after header: logos and link
+    if (cells.length === 0) return;
+
+    // First row: logos and link
     if (index === 0) {
       desktopLogo = getImage(cells[0]);
       mobileLogo = getImage(cells[1]);
 
+      // Extract link from third cell
       const linkEl = cells[2]?.querySelector('a');
       logoLink = linkEl ? linkEl.getAttribute('href') : getText(cells[2]);
     } else {
@@ -60,7 +63,7 @@ export default async function decorate(block) {
     }
   });
 
-  // Default if no languages
+  // Default if no languages found
   if (!languages.length) {
     languages.push({ name: 'English', code: 'en', label: 'Language' });
   }
@@ -142,12 +145,14 @@ export default async function decorate(block) {
     menu.appendChild(opt);
   });
 
+  // Toggle dropdown
   button.onclick = (e) => {
     e.stopPropagation();
     const isOpen = menu.classList.toggle('open');
     button.setAttribute('aria-expanded', isOpen);
   };
 
+  // Close on outside click
   document.addEventListener('click', () => {
     if (menu.classList.contains('open')) {
       menu.classList.remove('open');
@@ -155,6 +160,7 @@ export default async function decorate(block) {
     }
   });
 
+  // Keyboard support
   button.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
