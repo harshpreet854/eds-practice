@@ -316,7 +316,7 @@
 
 .kp-mobile-language-section .kp-language-option {
     padding: 12px 16px;
-    color: rgba(255, 255, 255, 0.9);
+    color: #0074AD;
 }
 
 .kp-mobile-language-section .kp-language-option:hover {
@@ -325,7 +325,7 @@
 
 .kp-mobile-language-section .kp-language-option.active {
     background-color: rgba(255, 255, 255, 0.2);
-    color: #0074AD;
+    color: white;
 }
 
 /* Hide mobile menu on desktop */
