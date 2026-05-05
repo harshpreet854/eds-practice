@@ -36,21 +36,29 @@ export default async function decorate(block) {
     return clone;
   };
 
-  console.log('Total rows:', rows.length);
-
   rows.forEach((row, index) => {
     const cells = row.querySelectorAll(':scope > div');
-    console.log(`Row ${index}: ${cells.length} cells`);
 
     // First row: logos and link
     if (index === 0) {
-      console.log('Processing row 0 - logos and link');
       desktopLogo = getImage(cells[0]);
       mobileLogo = getImage(cells[1]);
 
-      const linkEl = cells[2]?.querySelector('a');
-      logoLink = linkEl ? linkEl.getAttribute('href') : getText(cells[2]);
-      console.log('Logo link:', logoLink);
+      // Extract link - try to find <a> tag first
+      const linkCell = cells[2];
+      if (linkCell) {
+        const linkEl = linkCell.querySelector('a');
+        if (linkEl) {
+          logoLink = linkEl.getAttribute('href');
+        } else {
+          // If no <a> tag, use the text content
+          const linkText = getText(linkCell);
+          if (linkText) {
+            logoLink = linkText;
+          }
+        }
+      }
+      console.log('Logo link extracted:', logoLink);
     } else {
       // Subsequent rows: languages
       const name = getText(cells[0]);
@@ -70,7 +78,10 @@ export default async function decorate(block) {
 
   // Default if no languages
   if (!languages.length) {
-    languages.push({ name: 'English', code: 'en', label: 'Language' });
+    languages.push(
+      { name: 'English', code: 'en', label: 'Language' },
+      { name: 'Español', code: 'es', label: 'Idioma' }
+    );
   }
 
   // Clear and rebuild
@@ -99,7 +110,7 @@ export default async function decorate(block) {
 
   brand.appendChild(logoLinkEl);
 
-  /* ===== LANGUAGE DROPDOWN ===== */
+  /* ===== LANGUAGE DROPDOWN (DESKTOP) ===== */
   const langWrapper = document.createElement('div');
   langWrapper.className = 'kp-language-wrapper';
 
@@ -129,7 +140,7 @@ export default async function decorate(block) {
     });
   }
 
-  // Create language options
+  // Create language options for desktop dropdown
   languages.forEach((lang) => {
     const opt = document.createElement('button');
     opt.className = 'kp-language-option';
@@ -156,7 +167,6 @@ export default async function decorate(block) {
     button.setAttribute('aria-expanded', isOpen);
   };
 
-  // Close on outside click
   document.addEventListener('click', () => {
     if (menu.classList.contains('open')) {
       menu.classList.remove('open');
@@ -164,7 +174,6 @@ export default async function decorate(block) {
     }
   });
 
-  // Keyboard support
   button.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -179,7 +188,7 @@ export default async function decorate(block) {
 
   langWrapper.append(label, button, menu);
 
-  // Mobile menu overlay
+  /* ===== MOBILE MENU ===== */
   const mobileMenuOverlay = document.createElement('div');
   mobileMenuOverlay.className = 'kp-mobile-menu-overlay';
 
@@ -250,7 +259,7 @@ export default async function decorate(block) {
   mobileMenu.append(mobileMenuHeader, mobileLanguageSection);
   mobileMenuOverlay.appendChild(mobileMenu);
 
-  // Hamburger button
+  /* ===== HAMBURGER BUTTON ===== */
   const hamburger = document.createElement('button');
   hamburger.className = 'kp-hamburger';
   hamburger.innerHTML = '☰';
@@ -273,6 +282,7 @@ export default async function decorate(block) {
     }
   };
 
+  /* ===== ASSEMBLE HEADER ===== */
   const desktopLangWrapper = document.createElement('div');
   desktopLangWrapper.className = 'kp-header-language';
   desktopLangWrapper.appendChild(langWrapper);

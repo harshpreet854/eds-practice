@@ -444,3 +444,17 @@
         padding: 16px 32px;
     }
 }
+
+/* Hide hamburger on desktop */
+@media (min-width: 600px) {
+    .kp-hamburger {
+        display: none !important;
+    }
+}
+
+/* Show hamburger on mobile */
+@media (max-width: 599px) {
+    .kp-header-language {
+        display: none !important;
+    }
+}
