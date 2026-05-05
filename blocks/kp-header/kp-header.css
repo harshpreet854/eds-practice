@@ -188,3 +188,19 @@
         padding: 16px 32px;
     }
 }
+
+.kp-logo-desktop {
+    display: none;  /* Hidden on mobile */
+}
+.kp-logo-mobile {
+    display: block;  /* Shown on mobile */
+}
+
+@media (min-width: 600px) {
+    .kp-logo-desktop {
+        display: block;  /* Shown on desktop */
+    }
+    .kp-logo-mobile {
+        display: none;  /* Hidden on desktop */
+    }
+}
