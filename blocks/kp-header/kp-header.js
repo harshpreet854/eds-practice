@@ -23,7 +23,7 @@ export default async function decorate(block) {
       const firstCell = cells[0];
 
       // Check if first cell contains an image
-      const img = firstCell?.querySelector('img');
+      const img = firstCell?.querySelector('svg');
       if (img) {
         logoElement = img.cloneNode(true);
       }
