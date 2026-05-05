@@ -50,8 +50,9 @@ export default async function decorate(block) {
   
   // Add logo if present
   if (logoElement) {
-    logoElement.classList.add('kp-header-logo');
-    brandSection.appendChild(logoElement);
+    const logoClone = logoElement.cloneNode(true);
+    logoClone.classList.add('kp-header-logo');
+    brandSection.appendChild(logoClone);
   }
 
 
