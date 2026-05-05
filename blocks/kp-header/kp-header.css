@@ -3,7 +3,6 @@
     color: white;
     width: 100%;
     font-family: var(--body-font-family);
-    position: relative;
 }
 
 /* Container */
@@ -58,7 +57,45 @@
 }
 
 /* ========================= */
-/* DESKTOP LANGUAGE */
+/* HAMBURGER BUTTON */
+/* ========================= */
+
+.kp-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    color: white;
+    font-size: 20px;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.kp-hamburger:hover {
+    border-color: rgba(255, 255, 255, 1);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.kp-hamburger::after {
+    content: 'Menu';
+    font-size: 12px;
+    margin-left: 6px;
+    font-weight: 600;
+}
+
+/* Hide hamburger on desktop */
+@media (min-width: 600px) {
+    .kp-hamburger {
+        display: none !important;
+    }
+}
+
+/* ========================= */
+/* LANGUAGE (DESKTOP) */
 /* ========================= */
 
 .kp-header-language {
@@ -169,292 +206,133 @@
 /* Hide desktop language on mobile */
 @media (max-width: 599px) {
     .kp-header-language {
-        display: none;
+        display: none !important;
     }
-}
-
-/* ========================= */
-/* HAMBURGER BUTTON (MOBILE) */
-/* ========================= */
-
-.kp-hamburger-button {
-    display: none;
-    background: transparent;
-    border: none;
-    color: white;
-    cursor: pointer;
-    padding: 8px;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-@media (max-width: 599px) {
-    .kp-hamburger-button {
-        display: flex;
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-    }
-}
-
-.kp-hamburger-icon {
-    display: block;
-    width: 24px;
-    height: 18px;
-    position: relative;
-}
-
-.kp-hamburger-icon::before,
-.kp-hamburger-icon::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 2px;
-    background: currentColor;
-    left: 0;
-}
-
-.kp-hamburger-icon::before {
-    top: 0;
-}
-
-.kp-hamburger-icon::after {
-    bottom: 0;
-}
-
-.kp-hamburger-icon {
-    background: linear-gradient(to bottom, currentColor 0%, currentColor 2px, transparent 2px, transparent 8px, currentColor 8px, currentColor 10px, transparent 10px, transparent 16px, currentColor 16px, currentColor 18px);
-    background-size: 100% 100%;
 }
 
 /* ========================= */
 /* MOBILE MENU */
 /* ========================= */
 
-.kp-mobile-backdrop {
+.kp-mobile-menu-overlay {
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    display: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
-.kp-mobile-backdrop.open {
-    opacity: 1;
-    visibility: visible;
+.kp-mobile-menu-overlay.open {
     display: block;
 }
 
 .kp-mobile-menu {
     position: fixed;
     top: 0;
-    right: 0;
+    right: -100%;
     width: 100%;
-    height: 100vh;
-    background: #0c2d57;
-    z-index: 1000;
+    height: 100%;
+    background-color: #0c2d57;
+    z-index: 1001;
+    transition: right 0.3s ease;
     display: flex;
     flex-direction: column;
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
     overflow-y: auto;
 }
 
-.kp-mobile-menu.open {
-    transform: translateX(0);
+.kp-mobile-menu-overlay.open .kp-mobile-menu {
+    right: 0;
 }
 
-.kp-mobile-header {
+/* Mobile Menu Header */
+.kp-mobile-menu-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px;
+    padding: 16px 24px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    gap: 16px;
+    flex-shrink: 0;
 }
 
-.kp-mobile-brand {
-    flex: 1;
-}
-
-.kp-mobile-brand a {
+.kp-mobile-menu-header a {
     display: flex;
     align-items: center;
     text-decoration: none;
 }
 
-.kp-mobile-logo {
+.kp-mobile-menu-header img {
     height: 32px;
     width: auto;
-    display: block;
-    max-width: 100%;
 }
 
-/* Close Button */
-.kp-close-button {
+.kp-mobile-menu-close {
     background: transparent;
     border: none;
     color: white;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    padding: 8px;
-    min-width: 60px;
-    white-space: nowrap;
-}
-
-.kp-close-button:hover {
-    opacity: 0.8;
-}
-
-.kp-close-icon {
     font-size: 24px;
-    line-height: 1;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
 }
 
 /* Mobile Language Section */
 .kp-mobile-language-section {
-    padding: 24px 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .kp-mobile-language-label {
     font-size: 14px;
-    margin-bottom: 12px;
-    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
 }
 
-.kp-mobile-language-button {
+.kp-mobile-language-section .kp-language-button {
     width: 100%;
     padding: 12px 16px;
-    background-color: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    color: white;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.2s ease;
-}
-
-.kp-mobile-language-button:hover {
-    border-color: rgba(255, 255, 255, 1);
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.kp-mobile-language-button::after {
-    content: '▾';
-    font-size: 12px;
-    transition: transform 0.2s ease;
-}
-
-.kp-mobile-language-button[aria-expanded="true"]::after {
-    transform: rotate(180deg);
-}
-
-/* Mobile Language Dropdown */
-.kp-mobile-language-dropdown {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    margin-top: 12px;
-    display: none;
-    overflow: hidden;
-}
-
-.kp-mobile-language-dropdown.open {
-    display: block;
-}
-
-.kp-mobile-language-option {
-    width: 100%;
-    padding: 12px 16px;
-    border: none;
-    background: transparent;
-    color: white;
     text-align: left;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background-color 0.2s ease;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.kp-mobile-language-option:last-child {
-    border-bottom: none;
+.kp-mobile-language-section .kp-language-menu {
+    position: static;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: none;
+    box-shadow: none;
 }
 
-.kp-mobile-language-option:hover {
+.kp-mobile-language-section .kp-language-option {
+    padding: 12px 16px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.kp-mobile-language-section .kp-language-option:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.kp-mobile-language-section .kp-language-option.active {
     background-color: rgba(255, 255, 255, 0.2);
+    color: white;
 }
 
-.kp-mobile-language-option.active {
-    background-color: rgba(255, 255, 255, 0.2);
-    font-weight: 600;
-}
-
-.kp-mobile-language-option.active::after {
-    content: '✔';
-    color: #fff;
-}
-
-/* Hide on desktop */
+/* Hide mobile menu on desktop */
 @media (min-width: 600px) {
-    .kp-hamburger-button,
-    .kp-mobile-menu,
-    .kp-mobile-backdrop {
+    .kp-mobile-menu-overlay {
         display: none !important;
     }
 }
 
-/* Mobile optimizations */
-@media (max-width: 599px) {
-    .kp-header-container {
-        padding: 12px 16px;
-        gap: 12px;
-        padding-right: 80px;
-    }
-
-    .kp-language-label {
-        display: none;
-    }
-
-    .kp-language-button {
-        padding: 6px 12px;
-        font-size: 13px;
-    }
-}
-
+/* Desktop optimizations */
 @media (min-width: 600px) {
     .kp-header-container {
         padding: 16px 32px;
-    }
-}
-
-/* Hide hamburger on desktop */
-@media (min-width: 600px) {
-    .kp-hamburger {
-        display: none !important;
-    }
-}
-
-/* Show hamburger on mobile */
-@media (max-width: 599px) {
-    .kp-header-language {
-        display: none !important;
     }
 }
