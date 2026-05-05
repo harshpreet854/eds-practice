@@ -592,22 +592,8 @@ function decorateBlocks(main) {
  * @returns {Promise}
  */
 async function loadHeader(header) {
-  // Check if kp-header or any header block already exists
-  const existingBlock = header.querySelector('div.block[data-block-name], div.kp-header, div.header');
-  let headerBlock;
-
-  if (existingBlock && (existingBlock.classList.contains('block') || existingBlock.classList.contains('kp-header'))) {
-    // Use existing block
-    headerBlock = existingBlock;
-    if (!headerBlock.classList.contains('block')) {
-      headerBlock.classList.add('block');
-    }
-  } else {
-    // Create default header block
-    headerBlock = buildBlock('header', '');
-    header.append(headerBlock);
-  }
-
+  const headerBlock = buildBlock('header', '');
+  header.append(headerBlock);
   decorateBlock(headerBlock);
   return loadBlock(headerBlock);
 }
