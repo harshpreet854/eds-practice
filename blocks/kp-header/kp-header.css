@@ -1,5 +1,5 @@
 .kp-header {
-    background-color: #0c2d57;
+    background-color: #0D1C3D;
     color: white;
     width: 100%;
     font-family: var(--body-font-family);
@@ -166,7 +166,7 @@
     display: none;
     z-index: 100;
     overflow: hidden;
-    border: 1px solid #0d5cab;
+    border: 1px solid #0D1C3D;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -180,7 +180,7 @@
     padding: 12px 16px;
     border: none;
     background: #ffffff;
-    color: #003f87;
+    color: #0074AD;
     text-align: left;
     font-size: 14px;
     cursor: pointer;
@@ -201,7 +201,7 @@
 
 .kp-language-option.active::after {
     content: '✔';
-    color: #0d5cab;
+    color: #0074AD;
 }
 
 .kp-language-option:not(:last-child) {
@@ -240,7 +240,7 @@
     right: -100%;
     width: 100%;
     height: 100%;
-    background-color: #0c2d57;
+    background-color: #0D1C3D;
     z-index: 1001;
     transition: right 0.3s ease;
     display: flex;
