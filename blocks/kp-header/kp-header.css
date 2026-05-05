@@ -15,6 +15,11 @@
     margin: 0 auto;
 }
 
+/* Hide original block content - only show the decorated version */
+.kp-header > div {
+    display: none;
+}
+
 /* Logo */
 .kp-header-brand a {
     display: flex;
@@ -186,21 +191,5 @@
 @media (min-width: 600px) {
     .kp-header-container {
         padding: 16px 32px;
-    }
-}
-
-.kp-logo-desktop {
-    display: none;  /* Hidden on mobile */
-}
-.kp-logo-mobile {
-    display: block;  /* Shown on mobile */
-}
-
-@media (min-width: 600px) {
-    .kp-logo-desktop {
-        display: block;  /* Shown on desktop */
-    }
-    .kp-logo-mobile {
-        display: none;  /* Hidden on desktop */
     }
 }
