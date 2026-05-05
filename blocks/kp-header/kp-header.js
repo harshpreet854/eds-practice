@@ -1,4 +1,10 @@
 export default async function decorate(block) {
+  // IMPORTANT: Check if already decorated to prevent running twice
+  if (block.querySelector('.kp-header-container')) {
+    console.log('Block already decorated, skipping');
+    return;
+  }
+
   let desktopLogo = null;
   let mobileLogo = null;
   let logoLink = '#';
@@ -131,7 +137,7 @@ export default async function decorate(block) {
     );
   }
 
-  // Clear and rebuild
+  // Clear and rebuild - AFTER extracting data
   block.textContent = '';
   block.className = 'kp-header';
 
