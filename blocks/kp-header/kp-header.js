@@ -1,5 +1,5 @@
 export default async function decorate(block) {
-  const rows = Array.from(block.children);
+  const rows = Array.from(block.querySelectorAll(':scope > div'));
 
   let desktopLogo = null;
   let mobileLogo = null;
@@ -36,30 +36,44 @@ export default async function decorate(block) {
     return clone;
   };
 
+  console.log('Total rows:', rows.length);
+
   rows.forEach((row, index) => {
     const cells = row.querySelectorAll(':scope > div');
+    console.log(`Row ${index}: ${cells.length} cells`);
 
+    // First row: logos and link
     if (index === 0) {
+      console.log('Processing row 0 - logos and link');
       desktopLogo = getImage(cells[0]);
       mobileLogo = getImage(cells[1]);
 
       const linkEl = cells[2]?.querySelector('a');
       logoLink = linkEl ? linkEl.getAttribute('href') : getText(cells[2]);
+      console.log('Logo link:', logoLink);
     } else {
+      // Subsequent rows: languages
       const name = getText(cells[0]);
       const code = getText(cells[1]);
       const label = getText(cells[2]);
 
+      console.log(`Row ${index}: name="${name}", code="${code}", label="${label}"`);
+
       if (name && code) {
         languages.push({ name, code, label: label || 'Language' });
+        console.log(`Added language: ${name} (${code})`);
       }
     }
   });
 
+  console.log('Final languages array:', languages);
+
+  // Default if no languages
   if (!languages.length) {
     languages.push({ name: 'English', code: 'en', label: 'Language' });
   }
 
+  // Clear and rebuild
   block.textContent = '';
   block.className = 'kp-header';
 
@@ -85,7 +99,7 @@ export default async function decorate(block) {
 
   brand.appendChild(logoLinkEl);
 
-  /* ===== DESKTOP LANGUAGE DROPDOWN ===== */
+  /* ===== LANGUAGE DROPDOWN ===== */
   const langWrapper = document.createElement('div');
   langWrapper.className = 'kp-language-wrapper';
 
@@ -113,17 +127,9 @@ export default async function decorate(block) {
       opt.classList.toggle('active', isActive);
       opt.setAttribute('aria-selected', isActive);
     });
-
-    // Update mobile menu if it exists
-    const mobileMenu = document.querySelector('.kp-mobile-menu');
-    if (mobileMenu) {
-      const mobileLangButton = mobileMenu.querySelector('.kp-mobile-language-button');
-      if (mobileLangButton) {
-        mobileLangButton.textContent = lang.name;
-      }
-    }
   }
 
+  // Create language options
   languages.forEach((lang) => {
     const opt = document.createElement('button');
     opt.className = 'kp-language-option';
@@ -150,6 +156,7 @@ export default async function decorate(block) {
     button.setAttribute('aria-expanded', isOpen);
   };
 
+  // Close on outside click
   document.addEventListener('click', () => {
     if (menu.classList.contains('open')) {
       menu.classList.remove('open');
@@ -157,6 +164,7 @@ export default async function decorate(block) {
     }
   });
 
+  // Keyboard support
   button.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -171,148 +179,104 @@ export default async function decorate(block) {
 
   langWrapper.append(label, button, menu);
 
-  const langDesktop = document.createElement('div');
-  langDesktop.className = 'kp-header-language';
-  langDesktop.appendChild(langWrapper);
-
-  header.append(brand, langDesktop);
-  block.appendChild(header);
-
-  /* ===== HAMBURGER MENU (MOBILE) ===== */
-  const hamburger = document.createElement('button');
-  hamburger.className = 'kp-hamburger-button';
-  hamburger.setAttribute('aria-label', 'Open menu');
-  hamburger.setAttribute('aria-expanded', 'false');
-  hamburger.innerHTML = `
-    <span class="kp-hamburger-icon"></span>
-    <span class="kp-hamburger-text">Menu</span>
-  `;
-
-  const mobileMenuBackdrop = document.createElement('div');
-  mobileMenuBackdrop.className = 'kp-mobile-backdrop';
+  // Mobile menu overlay
+  const mobileMenuOverlay = document.createElement('div');
+  mobileMenuOverlay.className = 'kp-mobile-menu-overlay';
 
   const mobileMenu = document.createElement('div');
   mobileMenu.className = 'kp-mobile-menu';
 
-  const mobileHeader = document.createElement('div');
-  mobileHeader.className = 'kp-mobile-header';
+  const mobileMenuHeader = document.createElement('div');
+  mobileMenuHeader.className = 'kp-mobile-menu-header';
 
-  const mobileBrand = document.createElement('div');
-  mobileBrand.className = 'kp-mobile-brand';
-  const mobileLogoLinkEl = document.createElement('a');
-  mobileLogoLinkEl.href = logoLink;
-
+  const mobileMenuLogo = document.createElement('a');
+  mobileMenuLogo.href = logoLink;
   if (mobileLogo) {
-    const mobileLogoClone = mobileLogo.cloneNode(true);
-    mobileLogoClone.classList.remove('kp-logo-mobile');
-    mobileLogoClone.classList.add('kp-mobile-logo');
-    mobileLogoLinkEl.appendChild(mobileLogoClone);
+    const logoClone = mobileLogo.cloneNode(true);
+    logoClone.classList.remove('kp-logo-mobile');
+    mobileMenuLogo.appendChild(logoClone);
   }
 
-  mobileBrand.appendChild(mobileLogoLinkEl);
-
   const closeButton = document.createElement('button');
-  closeButton.className = 'kp-close-button';
+  closeButton.className = 'kp-mobile-menu-close';
+  closeButton.innerHTML = '✕';
   closeButton.setAttribute('aria-label', 'Close menu');
-  closeButton.innerHTML = `
-    <span class="kp-close-icon">✕</span>
-    <span class="kp-close-text">Close</span>
-  `;
 
-  mobileHeader.append(mobileBrand, closeButton);
-  mobileMenu.appendChild(mobileHeader);
+  mobileMenuHeader.append(mobileMenuLogo, closeButton);
 
-  /* Mobile Language Menu */
   const mobileLanguageSection = document.createElement('div');
   mobileLanguageSection.className = 'kp-mobile-language-section';
 
-  const mobileLanguageLabel = document.createElement('div');
-  mobileLanguageLabel.className = 'kp-mobile-language-label';
-  mobileLanguageLabel.textContent = current.label || 'Language';
+  const mobileLabel = document.createElement('span');
+  mobileLabel.className = 'kp-mobile-language-label';
+  mobileLabel.textContent = current.label || 'Language';
 
-  const mobileLanguageButton = document.createElement('button');
-  mobileLanguageButton.className = 'kp-mobile-language-button';
-  mobileLanguageButton.textContent = current.name;
-  mobileLanguageButton.setAttribute('aria-haspopup', 'listbox');
-  mobileLanguageButton.setAttribute('aria-expanded', 'false');
+  const mobileButton = document.createElement('button');
+  mobileButton.className = 'kp-language-button';
+  mobileButton.setAttribute('aria-haspopup', 'listbox');
+  mobileButton.setAttribute('aria-expanded', 'false');
+  mobileButton.textContent = current.name;
 
-  const mobileLanguageDropdown = document.createElement('div');
-  mobileLanguageDropdown.className = 'kp-mobile-language-dropdown';
-  mobileLanguageDropdown.setAttribute('role', 'listbox');
+  const mobileMenu2 = document.createElement('div');
+  mobileMenu2.className = 'kp-language-menu';
 
   languages.forEach((lang) => {
     const opt = document.createElement('button');
-    opt.className = 'kp-mobile-language-option';
+    opt.className = 'kp-language-option';
     opt.textContent = lang.name;
     opt.dataset.code = lang.code;
     opt.setAttribute('role', 'option');
     opt.setAttribute('aria-selected', lang.code === current.code);
 
-    if (lang.code === current.code) {
-      opt.classList.add('active');
-    }
-
     opt.onclick = (e) => {
       e.stopPropagation();
       current = lang;
-
-      mobileLanguageButton.textContent = lang.name;
-      mobileLanguageLabel.textContent = lang.label || 'Language';
-
-      mobileLanguageDropdown.querySelectorAll('.kp-mobile-language-option').forEach((o) => {
-        o.classList.remove('active');
-        o.setAttribute('aria-selected', 'false');
-      });
-
-      opt.classList.add('active');
-      opt.setAttribute('aria-selected', 'true');
-
-      mobileLanguageDropdown.classList.remove('open');
-      mobileLanguageButton.setAttribute('aria-expanded', 'false');
-
-      updateUI(lang);
+      mobileButton.textContent = lang.name;
+      mobileLabel.textContent = lang.label || 'Language';
+      mobileMenu2.classList.remove('open');
+      mobileButton.setAttribute('aria-expanded', 'false');
     };
 
-    mobileLanguageDropdown.appendChild(opt);
+    mobileMenu2.appendChild(opt);
   });
 
-  mobileLanguageButton.onclick = (e) => {
+  mobileButton.onclick = (e) => {
     e.stopPropagation();
-    const isOpen = mobileLanguageDropdown.classList.toggle('open');
-    mobileLanguageButton.setAttribute('aria-expanded', isOpen);
+    const isOpen = mobileMenu2.classList.toggle('open');
+    mobileButton.setAttribute('aria-expanded', isOpen);
   };
 
-  mobileLanguageSection.append(mobileLanguageLabel, mobileLanguageButton, mobileLanguageDropdown);
-  mobileMenu.appendChild(mobileLanguageSection);
+  mobileLanguageSection.append(mobileLabel, mobileButton, mobileMenu2);
+  mobileMenu.append(mobileMenuHeader, mobileLanguageSection);
+  mobileMenuOverlay.appendChild(mobileMenu);
 
-  /* Close menu handlers */
-  function closeMenu() {
-    hamburger.setAttribute('aria-expanded', 'false');
-    mobileMenuBackdrop.classList.remove('open');
-    mobileMenu.classList.remove('open');
+  // Hamburger button
+  const hamburger = document.createElement('button');
+  hamburger.className = 'kp-hamburger';
+  hamburger.innerHTML = '☰';
+  hamburger.setAttribute('aria-label', 'Open menu');
+
+  hamburger.onclick = () => {
+    mobileMenuOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  closeButton.onclick = () => {
+    mobileMenuOverlay.classList.remove('open');
     document.body.style.overflow = '';
-  }
+  };
 
-  closeButton.addEventListener('click', closeMenu);
-  mobileMenuBackdrop.addEventListener('click', closeMenu);
-
-  hamburger.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
-    hamburger.setAttribute('aria-expanded', !isOpen);
-    mobileMenuBackdrop.classList.toggle('open');
-    mobileMenu.classList.toggle('open');
-    document.body.style.overflow = !isOpen ? 'hidden' : '';
-  });
-
-  /* Close on escape */
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
-      closeMenu();
+  mobileMenuOverlay.onclick = (e) => {
+    if (e.target === mobileMenuOverlay) {
+      mobileMenuOverlay.classList.remove('open');
+      document.body.style.overflow = '';
     }
-  });
+  };
 
-  block.appendChild(hamburger);
-  block.appendChild(mobileMenuBackdrop);
-  block.appendChild(mobileMenu);
+  const desktopLangWrapper = document.createElement('div');
+  desktopLangWrapper.className = 'kp-header-language';
+  desktopLangWrapper.appendChild(langWrapper);
+
+  header.append(hamburger, brand, desktopLangWrapper);
+  block.append(header, mobileMenuOverlay);
 }
