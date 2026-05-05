@@ -13,7 +13,6 @@ export default async function decorate(block) {
     const cells = row.querySelectorAll(':scope > div');
 
     if (index === 0) {
-      // FULL content (not just img)
       desktopLogoContent = cells[0]?.innerHTML;
     } else if (index === 1) {
       mobileLogoContent = cells[0]?.innerHTML;
@@ -42,16 +41,12 @@ export default async function decorate(block) {
   const header = document.createElement('div');
   header.className = 'kp-header-container';
 
-  /* ========================= */
   /* LOGO */
-  /* ========================= */
-
   const brand = document.createElement('div');
   brand.className = 'kp-header-brand';
 
   const logoLinkEl = document.createElement('a');
   logoLinkEl.href = logoLink;
-  logoLinkEl.className = 'kp-header-logo-link';
 
   if (desktopLogoContent) {
     const d = document.createElement('div');
@@ -69,10 +64,7 @@ export default async function decorate(block) {
 
   brand.appendChild(logoLinkEl);
 
-  /* ========================= */
   /* LANGUAGE */
-  /* ========================= */
-
   const langWrapper = document.createElement('div');
   langWrapper.className = 'kp-language-wrapper';
 
@@ -87,11 +79,13 @@ export default async function decorate(block) {
 
   let current = languages[0];
 
+  // ✅ declare BEFORE use
+  let mobileHeaderLabel = null;
+
   function updateLanguageUI(lang) {
     button.textContent = lang.name;
     label.textContent = lang.label || 'Language';
 
-    // update active state
     menu.querySelectorAll('.kp-language-option').forEach((opt) => {
       opt.classList.remove('active');
       if (opt.dataset.code === lang.code) {
@@ -99,7 +93,7 @@ export default async function decorate(block) {
       }
     });
 
-    // update mobile header label if exists
+    // safe check
     if (mobileHeaderLabel) {
       mobileHeaderLabel.textContent = lang.label || 'Language';
     }
@@ -134,18 +128,13 @@ export default async function decorate(block) {
     menu.classList.remove('open');
   });
 
-  updateLanguageUI(current);
-
   langWrapper.append(label, button, menu);
 
   const langDesktop = document.createElement('div');
   langDesktop.className = 'kp-header-language';
   langDesktop.appendChild(langWrapper);
 
-  /* ========================= */
   /* MOBILE MENU */
-  /* ========================= */
-
   const menuBtn = document.createElement('button');
   menuBtn.className = 'kp-menu-button';
   menuBtn.innerHTML = `
@@ -159,7 +148,8 @@ export default async function decorate(block) {
   const mobileHeader = document.createElement('div');
   mobileHeader.className = 'kp-mobile-header';
 
-  const mobileHeaderLabel = document.createElement('span');
+  // ✅ NOW initialize properly
+  mobileHeaderLabel = document.createElement('span');
   mobileHeaderLabel.textContent = current.label;
 
   const closeBtn = document.createElement('button');
@@ -183,10 +173,10 @@ export default async function decorate(block) {
 
   document.body.appendChild(mobileMenu);
 
-  /* ========================= */
-  /* ASSEMBLE */
-  /* ========================= */
+  /* INIT UI AFTER EVERYTHING EXISTS */
+  updateLanguageUI(current);
 
+  /* ASSEMBLE */
   header.appendChild(brand);
   header.appendChild(menuBtn);
   header.appendChild(langDesktop);
