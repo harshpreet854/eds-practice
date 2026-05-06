@@ -611,20 +611,14 @@ async function loadHeader(header) {
     const fragment = await loadFragment(navPath);
 
     // Look for kp-header in the fragment (might be nested)
-    let headerBlock = fragment.querySelector('.kp-header');
+    const headerBlock = fragment.querySelector('.kp-header');
 
     if (headerBlock) {
-      // Clone it to avoid moving nodes out of the fragment tree.
-      // Keep the authored content intact so kp-header can parse logos/languages.
-      headerBlock = headerBlock.cloneNode(true);
-
-      // Ensure the clone is treated as a block and (re)loaded once in the header.
-      headerBlock.dataset.blockStatus = 'initialized';
-      delete headerBlock.dataset.blockName;
-
+      // loadFragment() already decorates and loads blocks. Move the live block
+      // into <header> so existing event listeners (desktop/mobile interactions)
+      // stay attached.
       header.append(headerBlock);
-      decorateBlock(headerBlock);
-      return loadBlock(headerBlock);
+      return null;
     }
   } catch (error) {
     // If fragment loading fails, continue to fallback
