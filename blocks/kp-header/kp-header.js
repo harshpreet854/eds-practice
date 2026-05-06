@@ -37,6 +37,18 @@ export default async function decorate(block) {
 
     const clone = el.cloneNode(true);
     fixImageUrls(clone);
+
+    // Logo images must load eagerly — they are always in the visible header area.
+    // When the block is loaded as a nav fragment the images start life in a
+    // detached DOM, so lazy-loaded images never fire and remain blank.
+    let img = null;
+    if (clone.querySelector) {
+      img = clone.querySelector('img');
+    } else if (clone.tagName === 'IMG') {
+      img = clone;
+    }
+    if (img) img.loading = 'eager';
+
     return clone;
   };
 
@@ -54,9 +66,7 @@ export default async function decorate(block) {
   } else {
     // Handle DIV structure
     console.log('Processing DIV structure');
-    rows = Array.from(block.querySelectorAll(':scope > div')).map((row) =>
-      Array.from(row.querySelectorAll(':scope > div'))
-    );
+    rows = Array.from(block.querySelectorAll(':scope > div')).map((row) => Array.from(row.querySelectorAll(':scope > div')));
   }
 
   console.log('Total rows:', rows.length);
@@ -76,7 +86,7 @@ export default async function decorate(block) {
         console.log('Cell 2 textContent:', cells[2].textContent);
 
         // Method 1: Direct <a> tag
-        let linkEl = cells[2].querySelector('a');
+        const linkEl = cells[2].querySelector('a');
         if (linkEl) {
           logoLink = linkEl.getAttribute('href');
           console.log('✓ Method 1 - Found <a> tag:', logoLink);
@@ -133,7 +143,7 @@ export default async function decorate(block) {
   if (!languages.length) {
     languages.push(
       { name: 'English', code: 'en', label: 'Language' },
-      { name: 'Español', code: 'es', label: 'Idioma' }
+      { name: 'Español', code: 'es', label: 'Idioma' },
     );
   }
 
