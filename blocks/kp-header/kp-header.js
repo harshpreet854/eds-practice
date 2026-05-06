@@ -1,7 +1,6 @@
 export default async function decorate(block) {
   // IMPORTANT: Check if already decorated to prevent running twice
   if (block.querySelector('.kp-header-container')) {
-    console.log('Block already decorated, skipping');
     return;
   }
 
@@ -58,23 +57,17 @@ export default async function decorate(block) {
 
   if (table) {
     // Handle TABLE structure
-    console.log('Processing TABLE structure');
     const trs = table.querySelectorAll('tbody tr');
     rows = Array.from(trs).map((tr) => Array.from(tr.querySelectorAll('td')));
     // Skip header row (first row with colspan)
     rows = rows.slice(1);
   } else {
     // Handle DIV structure
-    console.log('Processing DIV structure');
     rows = Array.from(block.querySelectorAll(':scope > div')).map((row) => Array.from(row.querySelectorAll(':scope > div')));
   }
 
-  console.log('Total rows:', rows.length);
 
   rows.forEach((cells, index) => {
-    console.log(`=== Row ${index} ===`);
-    console.log(`Cells count: ${cells.length}`);
-
     // First row: logos and link
     if (index === 0) {
       desktopLogo = getImage(cells[0]);
@@ -82,14 +75,11 @@ export default async function decorate(block) {
 
       // Extract link from third cell
       if (cells[2]) {
-        console.log('Cell 2 innerHTML:', cells[2].innerHTML);
-        console.log('Cell 2 textContent:', cells[2].textContent);
 
         // Method 1: Direct <a> tag
         const linkEl = cells[2].querySelector('a');
         if (linkEl) {
           logoLink = linkEl.getAttribute('href');
-          console.log('✓ Method 1 - Found <a> tag:', logoLink);
         }
 
         // Method 2: Text content is URL
@@ -97,7 +87,6 @@ export default async function decorate(block) {
           const linkText = getText(cells[2]);
           if (linkText && (linkText.startsWith('http://') || linkText.startsWith('https://'))) {
             logoLink = linkText;
-            console.log('✓ Method 2 - Found URL text:', logoLink);
           }
         }
 
@@ -106,7 +95,6 @@ export default async function decorate(block) {
           const allLinks = cells[2].querySelectorAll('a');
           if (allLinks.length > 0) {
             logoLink = allLinks[0].getAttribute('href');
-            console.log('✓ Method 3 - Found link in children:', logoLink);
           }
         }
 
@@ -117,27 +105,22 @@ export default async function decorate(block) {
             const linkInP = pTag.querySelector('a');
             if (linkInP) {
               logoLink = linkInP.getAttribute('href');
-              console.log('✓ Method 4 - Found <a> in <p>:', logoLink);
             }
           }
         }
       }
-      console.log('Final logo link:', logoLink);
     } else {
       // Subsequent rows: languages
       const name = getText(cells[0]);
       const code = getText(cells[1]);
       const label = getText(cells[2]);
 
-      console.log(`Language row - name: "${name}", code: "${code}", label: "${label}"`);
 
       if (name && code) {
         languages.push({ name, code, label: label || 'Language' });
       }
     }
   });
-
-  console.log('Final languages array:', languages);
 
   // Default if no languages
   if (!languages.length) {
