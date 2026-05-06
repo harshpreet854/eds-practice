@@ -66,7 +66,6 @@ export default async function decorate(block) {
     rows = Array.from(block.querySelectorAll(':scope > div')).map((row) => Array.from(row.querySelectorAll(':scope > div')));
   }
 
-
   rows.forEach((cells, index) => {
     // First row: logos and link
     if (index === 0) {
@@ -75,7 +74,6 @@ export default async function decorate(block) {
 
       // Extract link from third cell
       if (cells[2]) {
-
         // Method 1: Direct <a> tag
         const linkEl = cells[2].querySelector('a');
         if (linkEl) {
@@ -114,8 +112,7 @@ export default async function decorate(block) {
       const name = getText(cells[0]);
       const code = getText(cells[1]);
       const label = getText(cells[2]);
-
-
+      
       if (name && code) {
         languages.push({ name, code, label: label || 'Language' });
       }
