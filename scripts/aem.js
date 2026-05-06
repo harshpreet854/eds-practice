@@ -616,6 +616,10 @@ async function loadHeader(header) {
     if (headerBlock) {
       // Clone it to avoid DOM issues
       headerBlock = headerBlock.cloneNode(true);
+
+      // Reset block status so it gets loaded fresh
+      headerBlock.dataset.blockStatus = 'initialized';
+
       header.append(headerBlock);
       decorateBlock(headerBlock);
       return loadBlock(headerBlock);
