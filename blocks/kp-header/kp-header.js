@@ -112,7 +112,7 @@ export default async function decorate(block) {
       const name = getText(cells[0]);
       const code = getText(cells[1]);
       const label = getText(cells[2]);
-      
+
       if (name && code) {
         languages.push({ name, code, label: label || 'Language' });
       }
