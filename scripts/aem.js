@@ -605,27 +605,22 @@ async function loadHeader(header) {
   // Fallback: try to load kp-header from nav fragment
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
-  
+
   try {
     const { loadFragment } = await import(`${window.hlx.codeBasePath}/blocks/fragment/fragment.js`);
     const fragment = await loadFragment(navPath);
-    
+
     // Look for kp-header in the fragment (might be nested)
     let headerBlock = fragment.querySelector('.kp-header');
-    
+
     if (headerBlock) {
-      // Clone it to avoid DOM issues
+      // Clone it to avoid moving nodes out of the fragment tree.
+      // Keep the authored content intact so kp-header can parse logos/languages.
       headerBlock = headerBlock.cloneNode(true);
 
-      // Reset all block-related data attributes so it gets re-decorated
+      // Ensure the clone is treated as a block and (re)loaded once in the header.
       headerBlock.dataset.blockStatus = 'initialized';
       delete headerBlock.dataset.blockName;
-
-      // Clear all classes except 'kp-header'
-      headerBlock.className = 'kp-header';
-
-      // Clear the block content
-      headerBlock.textContent = '';
 
       header.append(headerBlock);
       decorateBlock(headerBlock);
