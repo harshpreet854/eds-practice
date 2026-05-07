@@ -80,16 +80,24 @@
 
 .kp-mobile-nav-item a:any-link {
   display: block;
-  padding: 12px 0;
+  padding: 12px 0 12px 12px;
   color: white;
   text-decoration: none;
   font-size: 14px;
   line-height: 1.5;
+  border-left: 5px solid transparent;
   transition: color 0.2s ease;
 }
 
 .kp-mobile-nav-item a:hover {
   color: rgba(255, 255, 255, 0.8);
+}
+
+.kp-mobile-nav-item.active a:any-link,
+.kp-mobile-nav-item a[aria-current='page']:any-link {
+  font-weight: 600;
+  border-left-color: #0078b3;
+  padding-left: 7px;
 }
 
 /* Hide desktop nav on mobile */

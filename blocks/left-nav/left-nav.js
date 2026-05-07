@@ -32,6 +32,7 @@ function injectIntoMobileMenu(navItems) {
         a.textContent = item.title;
 
         if (item.active) {
+          li.classList.add('active');
           a.setAttribute('aria-current', 'page');
         }
 
