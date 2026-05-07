@@ -26,7 +26,7 @@
   padding: 0;
 }
 
-.left-nav-link {
+.left-nav .left-nav-link:any-link {
   display: block;
   padding: 10px 16px;
   color: #131313;
@@ -37,12 +37,12 @@
   transition: color 0.2s ease;
 }
 
-.left-nav-link:hover {
+.left-nav .left-nav-link:hover {
   color: #131313;
   text-decoration: underline;
 }
 
-.left-nav-link:focus-visible {
+.left-nav .left-nav-link:focus-visible {
   outline: 2px solid #3b63fb;
   outline-offset: 2px;
 }
