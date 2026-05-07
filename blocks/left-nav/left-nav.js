@@ -95,7 +95,11 @@ export default async function decorate(block) {
     a.textContent = item.title;
 
     // Set active state if current page
-    if (window.location.pathname === new URL(item.url, window.location).pathname) {
+    // Normalize paths to handle trailing slashes
+    const itemPathname = new URL(item.url, window.location).pathname.replace(/\/$/, '');
+    const currentPathname = window.location.pathname.replace(/\/$/, '');
+
+    if (itemPathname === currentPathname || itemPathname === '') {
       li.classList.add('active');
       a.setAttribute('aria-current', 'page');
     }
