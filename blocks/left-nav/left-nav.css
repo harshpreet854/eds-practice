@@ -2,9 +2,9 @@
 
 /* Rounded card container wrapping the whole nav */
 .left-nav {
-  background-color: #f5f7fa;
+  background-color: #f8fafc;
   border-radius: 8px;
-  padding: 8px 0;
+  padding: 20px 0 20px 0;
 }
 
 /* Desktop nav list */
@@ -23,36 +23,42 @@
 
 .left-nav-item {
   margin: 0;
-  padding: 0;
+  padding: 0 0 20px;
+}
+
+.left-nav-item:last-child {
+  padding-bottom: 0;
 }
 
 .left-nav .left-nav-link:any-link {
-  display: block;
-  padding: 10px 16px;
-  color: #131313;
+  display: inline-block;
+  padding: 0 0 0 15px;
+  color: #0d1c3d;
   text-decoration: none;
-  font-size: 14px;
-  line-height: 1.5;
-  border-left: 3px solid transparent;
+  font-size: 16px;
+  font-weight: normal;
+  line-height: 24px;
+  border-left: 5px solid transparent;
   transition: color 0.2s ease;
 }
 
 .left-nav .left-nav-link:hover {
-  color: #131313;
+  color: #0d1c3d;
   text-decoration: underline;
 }
 
 .left-nav .left-nav-link:focus-visible {
-  outline: 2px solid #3b63fb;
+  outline: 2px solid #0078b3;
   outline-offset: 2px;
 }
 
 /* Active state */
 .left-nav-item.active .left-nav-link {
-  color: #131313;
+  color: #0d1c3d;
   font-weight: 600;
-  border-left-color: #0d5c9e;
-  padding-left: 13px;
+  border-left-color: #0078b3;
+  padding-left: 10px;
+  pointer-events: none;
 }
 
 /* Mobile hamburger menu injection */
@@ -72,7 +78,7 @@
   padding: 0;
 }
 
-.kp-mobile-nav-item a {
+.kp-mobile-nav-item a:any-link {
   display: block;
   padding: 12px 0;
   color: white;
@@ -92,4 +98,3 @@
     display: none;
   }
 }
-
