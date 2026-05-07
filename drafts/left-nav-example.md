@@ -4,17 +4,9 @@ Our member website, is.up, and the Kaiser Permanente mobile app are currently un
 
 As always, you can call if you have questions or need help with our care and services. To find the right phone number, call Kaiser Permanente member services in your area or [Frequently Asked Questions](https://www.example.com/faq) for more information.
 
-| Home |
-| --- |
-| https://www.example.com |
-
-| Statements |
-| --- |
-| https://www.example.com/statements |
-
-| Frequently asked questions |
-| --- |
-| https://www.example.com/faq |
+| Home | https://www.example.com | |
+| Statements | https://www.example.com/statements | |
+| Frequently asked questions | https://www.example.com/faq | yes |
 
 | Section Metadata | |
 | --- | --- |

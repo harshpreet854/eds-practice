@@ -12,34 +12,42 @@ The `left-nav` is a reusable sidebar navigation block for the left rail (3-colum
 
 ## Authoring Content
 
-The left-nav block expects authored content as a simple table with one navigation item per row:
+The left-nav block expects authored content as a table with one navigation item per row:
 
 ### Structure
 
 ```
-| Label | Link |
-| Label | Link |
+| Label | Link | Active |
+| Label | Link |         |
 ```
+
+- **Column 1**: Navigation item label/text
+- **Column 2**: URL or link to page
+- **Column 3** (optional): Marker to indicate this item is selected/active (any non-empty value, e.g., "yes", "✓", "true")
 
 ### Example
 
 Row 1:
 - Cell 1: `Home`
-- Cell 2: https://www.example.com/ (or a link: [link text](URL))
+- Cell 2: https://www.example.com/
+- Cell 3: (empty — not active)
 
 Row 2:
 - Cell 1: `Statements`
 - Cell 2: https://www.example.com/statements
+- Cell 3: `yes` ← **This item will be highlighted**
 
 Row 3:
 - Cell 1: `Frequently asked questions`
 - Cell 2: https://www.example.com/faq
+- Cell 3: (empty — not active)
 
 ## Markup
 
 In AEM CMS, author content as a table with:
 - **Column 1**: Navigation item label/text
 - **Column 2**: URL or link to page
+- **Column 3** (optional): Mark as active by adding any non-empty value (e.g., "yes", "✓", "active", "x")
 
 ## Styling
 
@@ -50,10 +58,14 @@ The block uses CSS custom properties from global styles:
 
 ### Active State
 
-The current page is detected by comparing `window.location.pathname` with the link URL. The matching nav item automatically gets:
-- `color: var(--link-color)`
-- `font-weight: 600`
-- Left blue border
+The active/selected item is determined by the author in the **third column** of the authoring table. Any non-empty value marks that item as active.
+
+The active item automatically gets:
+- `color: #131313` (dark text)
+- `font-weight: 600` (bold)
+- Left border: `3px solid #3b63fb` (blue)
+- `background-color: #f8f8f8` (light gray background)
+- `aria-current="page"` attribute for accessibility
 
 ## Responsive Behavior
 
@@ -109,8 +121,10 @@ Mobile menu injection:
 
 - Links open in the same window (no target="_blank")
 - No scroll behavior modification; user's browser scroll handling applies
-- Active state is checked on page load only (not updated on dynamic navigation)
+- **Active state is author-defined** via the third column in the authoring table
+- Only one item should be marked as active per nav block (author responsibility)
 - Mobile injection waits up to 5 seconds for kp-header to be ready
+- Any non-empty value in the third column marks an item as active (e.g., "yes", "✓", "true", "x", "1")
 
 ## Testing
 

@@ -1,6 +1,6 @@
 /**
  * Injects left-nav items into the kp-header mobile menu
- * @param {Array} navItems Array of {title, url} objects
+ * @param {Array} navItems Array of {title, url, active} objects
  */
 function injectIntoMobileMenu(navItems) {
   // Wait for kp-header mobile menu to be ready
@@ -31,6 +31,10 @@ function injectIntoMobileMenu(navItems) {
         a.href = item.url;
         a.textContent = item.title;
 
+        if (item.active) {
+          a.setAttribute('aria-current', 'page');
+        }
+
         li.appendChild(a);
         navList.appendChild(li);
       });
@@ -50,10 +54,11 @@ function injectIntoMobileMenu(navItems) {
  * Loads and decorates the left-nav block
  * Desktop: displays as a vertical sidebar navigation
  * Mobile: injects items into the kp-header mobile menu
+ * Authoring: third column indicates active/selected item
  * @param {Element} block The block element
  */
 export default async function decorate(block) {
-  // Parse authoring: each row is title | link
+  // Parse authoring: each row is title | link | active
   const rows = Array.from(block.querySelectorAll(':scope > div'));
   const navItems = [];
 
@@ -64,10 +69,15 @@ export default async function decorate(block) {
       const linkEl = cells[1]?.querySelector('a');
       const linkUrl = linkEl?.href || cells[1]?.textContent?.trim() || '#';
 
+      // Third column indicates if this item is active (any non-empty value marks it as active)
+      const activeIndicator = cells[2]?.textContent?.trim() || '';
+      const isActive = activeIndicator && activeIndicator.toLowerCase() !== '';
+
       if (titleText && linkUrl !== '#') {
         navItems.push({
           title: titleText,
           url: linkUrl,
+          active: isActive,
         });
       }
     }
@@ -94,12 +104,8 @@ export default async function decorate(block) {
     a.href = item.url;
     a.textContent = item.title;
 
-    // Set active state if current page
-    // Normalize paths to handle trailing slashes
-    const itemPathname = new URL(item.url, window.location).pathname.replace(/\/$/, '');
-    const currentPathname = window.location.pathname.replace(/\/$/, '');
-
-    if (itemPathname === currentPathname || itemPathname === '') {
+    // Set active state based on authored indicator
+    if (item.active) {
       li.classList.add('active');
       a.setAttribute('aria-current', 'page');
     }
