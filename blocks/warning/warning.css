@@ -55,13 +55,6 @@
 
 @media (max-width: 599px) {
   .warning {
-    padding: 20px;
-    border-radius: 14px;
-  }
-
-  .warning .warning-title {
-    font-size: 38px;
-    line-height: 42px;
+    display: none;
   }
 }
-
